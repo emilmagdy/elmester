@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة مستشارك - المدرسين</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 40px; background-color: #f8f9fa; color: #333; }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 30px; }
+        .teacher-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; border-right: 5px solid #3498db; }
+        .teacher-name { margin: 0 0 10px 0; color: #2980b9; }
+        .teacher-info { margin: 5px 0; color: #7f8c8d; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>قائمة المدرسين المسجلين في منصة مستشارك 🎓</h1>
+
+        <% teachers.forEach(teacher => { %>
+            <div class="teacher-card">
+                <h2 class="teacher-name">الأستاذ / <%= teacher.name %></h2>
+                <p class="teacher-info"><strong>المادة:</strong> <%= teacher.subject || 'غير محددة بعد' %></p>
+                <p class="teacher-info"><strong>الكود الرقمي (ID):</strong> <%= teacher.id %></p>
+            </div>
+        <% }) %>
+        
+    </div>
+
+</body>
+</html>

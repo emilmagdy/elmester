@@ -23,11 +23,7 @@ app.get('/', async (req, res) => {
         console.log("Data retrieved successfully from cloud:", result.rows);
         
         // Send the JSON data to the browser directly
-        res.send(`
-            <h1>Mestarak Web App</h1>
-            <h3>Teachers retrieved from cloud database:</h3>
-            <pre>${JSON.stringify(result.rows, null, 2)}</pre>
-        `);
+        res.render("index" , {teachers: result.rows});
     } catch (err) {
         // Log errors in the terminal if the connection fails
         console.error("Database connection error:", err);
