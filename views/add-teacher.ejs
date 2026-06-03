@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - إضافة مدرس جديد</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
+    <style>
+        body {
+            background-color: #f8f9fa; /* رمادي هادي مريح للعين */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .form-container {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(198, 144, 144, 0.05); /* ظل ناعم بيدي احترافية وعمق */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                
+                <div class="form-container p-5 mt-4">
+                    <h2 class="text-center mb-4 text-primary fw-bold">إضافة مدرس جديد</h2>
+                    <p class="text-muted text-center small mb-4">أدخل بيانات المدرس بدقة ليتم نشرها فوراً على منصة مستشارك</p>
+                    
+                    <form action="/admin-insert?secret=EmilPassword123" method="POST">
+                        
+                        <div class="mb-4">
+                            <label for="name" class="form-label fw-semibold">اسم المدرس:</label>
+                            <input type="text" class="form-control form-control-lg" id="name" name="name" placeholder="مثال: مستر محمد أحمد" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="subject" class="form-label fw-semibold">المادة الدراسية:</label>
+                            <input type="text" class="form-control form-control-lg" id="subject" name="subject" placeholder="مثال: فيزياء" required>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg fw-bold">حفظ المدرس ونشره 🚀</button>
+                            <a href="/" class="btn btn-light btn-sm text-muted mt-2">إلغاء والعودة للرئيسية</a>
+                        </div>
+
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

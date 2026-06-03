@@ -58,7 +58,7 @@ app.post("/admin-insert" , async (req, res) => {
         // Destructure Name and Subject constants from the form body
         const {name , subject } = req.body;
         // Insert name and subject into the database
-        const queryText = "INSERT INTO teachers (name,subject) VVALUES ($1, $2)"
+        const queryText = "INSERT INTO teachers (name,subject) VALUES ($1, $2)"
         await pool.query(queryText, [name,subject]);
         // Success : Redirect to hte homepage
         res.redirect("/")
