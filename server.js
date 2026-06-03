@@ -13,6 +13,10 @@ const pool = new Pool({
 // Set EJS as the template engine
 app.set('view engine', 'ejs');
 
+// Middleware to parse the URL Encoded data embedded in the form body
+app.use(express.urlencoded({extended: true}));
+
+
 // Main route: Fetch teachers from the cloud and render them
 app.get('/', async (req, res) => {
     try {
@@ -31,7 +35,41 @@ app.get('/', async (req, res) => {
     }
 });
 
+// Route to render the form that will be used to input the data
+app.get("/admin-insert", (req,res) => {
+    // Get the secret key from the URL Parameters
+    const secretKey = req.query.secret;
+    //Validate the secret Key
+    if (secretKey === "EmilPassword123") {
+        res.render("add-teacher")
+    } else {
+        res.status(403).send("Access Denied : Unautherized entry")
+    }
+});
+// Post Route : To send the form data into the database
+app.post("/admin-insert" , async (req, res) => {
+    // Get the secret key from the URL Parameters
+    const secretKey = req.query.secret;
+    // Double Check to prevent direct attacks
+    if (secretKey !== "EmilPassword123") {
+       return  res.status(403).send("Access Denied : Unautherized entry")
+    };
+    try {
+        // Destructure Name and Subject constants from the form body
+        const {name , subject } = req.body;
+        // Insert name and subject into the database
+        const queryText = "INSERT INTO teachers (name,subject) VVALUES ($1, $2)"
+        await pool.query(queryText, [name,subject]);
+        // Success : Redirect to hte homepage
+        res.redirect("/")
+    } catch (err) {
+        console.error("Data insertion error", err);
+        res.status(500).send("Server Error : Failed to save data")
+    }});
+
+
+
 // Start the server and listen on the specified port
 app.listen(PORT, () => {
-    console.log(`Server is running successfully on: http://localhost:${PORT}`);
+    console.log(`Server is running successfully on: http://localhost:${PORT}`)
 });
