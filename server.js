@@ -1,5 +1,7 @@
 require("dotenv").config()
 
+const session = require("express-session")
+const bcrypt = require("bcrypt")
 const express = require('express');
 const { Pool } = require('pg');
 const app = express();
@@ -27,10 +29,18 @@ app.set('view engine', 'ejs');
 // Middleware to parse the URL Encoded data embedded in the form body
 app.use(express.urlencoded({extended: true}));
 
+// Configure session middleware to track logged-in users
+app.use(session({
+    secret: 'EmilSuperSecretKey2026', // Secret key to sign the session ID cookie
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 } // Session expires after 24 hours (in milliseconds)
+}));
 
-// ==========================================
+
+// ===================
 // 1. Home Page Route
-// ==========================================
+// ===================
 app.get('/', (req, res) => {
     // Renders index.ejs which contains navigation buttons and platform features
     res.render('index'); 
@@ -89,6 +99,40 @@ app.post("/admin-insert" , async (req, res) => {
         console.error("Data insertion error", err);
         res.status(500).send("Server Error : Failed to save data")
     }});
+
+// ===========================================
+// GET Route for renderign the singn up oage
+// ===========================================
+
+app.get("/singn-up", (req,res) => {
+    res.render("sign-up")
+});
+
+// ========================================================
+// POST Route for saving the sign up data into the database
+// ========================================================
+
+app.post("/sign-up", async (req,res) =>{
+    const {name, email , password ,grade } = req.body;
+try{
+    
+    const exits = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+    if (exits.rows.length > 0) {
+        return res.status(400).send("This email is already registered. Please log in ")
+    }
+    const hashedPassword = await bcrypt.hash(password, 10)
+    const newUser = await pool.query(
+            'INSERT INTO users (name, email, password_hash, grade) VALUES ($1, $2, $3, $4) RETURNING id, role',
+            [name, email, hashedPassword, grade]
+        );
+     req.session.userId = newUser.rows[0].id;
+     req.session.userRole = newUser.rows[0].role;
+     res.redirect("teachers-list");
+    } catch (err) {
+        console.error("Error during signup registration:", err);
+        res.status(500).send("Internal server error. Please try again later.");
+    }
+    });
 
 
 
