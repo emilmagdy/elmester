@@ -1,13 +1,24 @@
+require("dotenv").config()
+
 const express = require('express');
 const { Pool } = require('pg');
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Connect to the cloud database (Neon) using the connection string
-const connectionString = 'postgresql://neondb_owner:npg_EZThlU8pdHO7@ep-lingering-mountain-aqnj526z.c-8.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require';
 const pool = new Pool({
-    connectionString: connectionString,
-    ssl: { rejectUnauthorized: false } // Required for secure cloud connection to Neon
+  connectionString: process.env.DATABASE_URL, // Your Neon connection string
+  ssl: {
+    rejectUnauthorized: false // Required for secure Neon cloud connections
+  },
+  // 1. Connection Timeout: Time to wait for a new connection before throwing an error (set to 10 seconds)
+  connectionTimeoutMillis: 10000, 
+  
+  // 2. Idle Timeout: Time a client can sit idle in the pool before being closed (set to 30 seconds)
+  idleTimeoutMillis: 30000, 
+  
+  // 3. Max Clients: Maximum number of clients allowed inside the pool simultaneously
+  max: 10 
 });
 
 // Set EJS as the template engine
@@ -17,25 +28,33 @@ app.set('view engine', 'ejs');
 app.use(express.urlencoded({extended: true}));
 
 
-// Main route: Fetch teachers from the cloud and render them
-app.get('/', async (req, res) => {
-    try {
-        // Query to select all records from the teachers table
-        const result = await pool.query('SELECT * FROM teachers;');
-        
-        // Log the data in the terminal for debugging purposes
-        console.log("Data retrieved successfully from cloud:", result.rows);
-        
-        // Send the JSON data to the browser directly
-        res.render("index" , {teachers: result.rows});
-    } catch (err) {
-        // Log errors in the terminal if the connection fails
-        console.error("Database connection error:", err);
-        res.status(500).send("Error connecting to the database");
-    }
+// ==========================================
+// 1. Home Page Route
+// ==========================================
+app.get('/', (req, res) => {
+    // Renders index.ejs which contains navigation buttons and platform features
+    res.render('index'); 
 });
 
-// Route to render the form that will be used to input the data
+// ==========================================
+// 2. Teachers List Route
+// ==========================================
+app.get('/teachers', async (req, res) => {
+    try {
+        // Fetch all teachers from Neon PostgreSQL database ordered by newest first
+        const result = await pool.query('SELECT * FROM teachers ORDER BY id DESC');
+        
+        // Pass the database rows to teachers-list.ejs view
+        res.render('teachers-list', { teachers: result.rows }); 
+    } catch (err) {
+        console.error("Database fetch error:", err);
+        res.status(500).send("Server Error: Status 500 - Failed to load teachers list");
+    }
+});
+// ================================================================
+// GET Route to render the form that will be used to input the data
+// ================================================================
+
 app.get("/admin-insert", (req,res) => {
     // Get the secret key from the URL Parameters
     const secretKey = req.query.secret;
@@ -46,7 +65,11 @@ app.get("/admin-insert", (req,res) => {
         res.status(403).send("Access Denied : Unautherized entry")
     }
 });
+
+// ====================================================
 // Post Route : To send the form data into the database
+// ====================================================
+
 app.post("/admin-insert" , async (req, res) => {
     // Get the secret key from the URL Parameters
     const secretKey = req.query.secret;
