@@ -104,7 +104,7 @@ app.post("/admin-insert" , async (req, res) => {
 // GET Route for renderign the singn up oage
 // ===========================================
 
-app.get("/singn-up", (req,res) => {
+app.get("/sign-up", (req,res) => {
     res.render("sign-up")
 });
 
