@@ -57,7 +57,7 @@ app.get('/', (req, res) => {
 // ==========================================
 // 2. Teachers List Route
 // ==========================================
-app.get('/teachers', async (req, res) => {
+app.get('/teachers', requireAuth, async (req, res) => {
     try {
         // Fetch all teachers from Neon PostgreSQL database ordered by newest first
         const result = await pool.query('SELECT * FROM teachers ORDER BY id DESC');
@@ -153,13 +153,29 @@ app.get("/login", (req, res) => {
 // ===========================================
 // POST Route for sending the login credntials
 // ===========================================
- app.post("/login", (req, res) => {
+ app.post("/login", async (req, res) => {
     const {email, password} = req.body;
-    const emailExits = pool.query("SELECT * FROM users WHERE email = $1", [email]);
-    if (emailExits.rows.length == 0) {
-        return res.status(400).send("Invalid Email or Password")
+    try {
+        const result = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+        if (result.rows.length === 0) {
+        return res.status(400).send("Invalid Email or Password");
+    };
+    const user = result.rows[0];
+    const isMatch = await bcrypt.compare(password, user.password_hash);
+    if (!isMatch) {
+        return res.status(400).send("Invalis Email or Password");
     }
- })
+
+    req.session.userId = user.id;
+    req.session.userRole = user.role;
+
+    res.redirect("/teachers");
+    } catch (err) {
+        console.error("Error during login", err);
+        res.status(500).send("Internal Server error. Please try again later");
+    }
+});
+
 
 
 // Start the server and listen on the specified port
