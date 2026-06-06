@@ -34,9 +34,17 @@ app.use(session({
     secret: 'EmilSuperSecretKey2026', // Secret key to sign the session ID cookie
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 } // Session expires after 24 hours (in milliseconds)
+    cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 } // Session expires after 30 days (in milliseconds)
 }));
 
+// Middleware to protect the route from unautherized  users
+const requireAuth = (req, res, next) => {
+    if (req.session && req.session.userId) {
+        return next();
+    } else {
+        res.redirect("/login")
+    };
+};
 
 // ===================
 // 1. Home Page Route
@@ -55,7 +63,7 @@ app.get('/teachers', async (req, res) => {
         const result = await pool.query('SELECT * FROM teachers ORDER BY id DESC');
         
         // Pass the database rows to teachers-list.ejs view
-        res.render('teachers-list', { teachers: result.rows }); 
+        res.render('teachers', { teachers: result.rows }); 
     } catch (err) {
         console.error("Database fetch error:", err);
         res.status(500).send("Server Error: Status 500 - Failed to load teachers list");
@@ -101,18 +109,18 @@ app.post("/admin-insert" , async (req, res) => {
     }});
 
 // ===========================================
-// GET Route for renderign the singn up oage
+// GET Route for renderign the register page
 // ===========================================
 
-app.get("/sign-up", (req,res) => {
-    res.render("sign-up")
+app.get("/register", (req,res) => {
+    res.render("register")
 });
 
-// ========================================================
-// POST Route for saving the sign up data into the database
-// ========================================================
+// ===========================================================
+// POST Route for saving the registrion data into the database
+// ===========================================================
 
-app.post("/sign-up", async (req,res) =>{
+app.post("/register", async (req,res) =>{
     const {name, email , password ,grade } = req.body;
 try{
     
@@ -127,13 +135,31 @@ try{
         );
      req.session.userId = newUser.rows[0].id;
      req.session.userRole = newUser.rows[0].role;
-     res.redirect("teachers-list");
+     res.redirect("/teachers");
     } catch (err) {
         console.error("Error during signup registration:", err);
         res.status(500).send("Internal server error. Please try again later.");
     }
     });
 
+// ======================================
+// GET Route for rendering the login page
+// ======================================  
+
+app.get("/login", (req, res) => {
+    res.render("login")
+});
+
+// ===========================================
+// POST Route for sending the login credntials
+// ===========================================
+ app.post("/login", (req, res) => {
+    const {email, password} = req.body;
+    const emailExits = pool.query("SELECT * FROM users WHERE email = $1", [email]);
+    if (emailExits.rows.length == 0) {
+        return res.status(400).send("Invalid Email or Password")
+    }
+ })
 
 
 // Start the server and listen on the specified port
