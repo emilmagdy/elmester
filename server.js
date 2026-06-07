@@ -64,7 +64,7 @@ app.get('/', (req, res) => {
 // ==========================================
 // 2. Teachers List Route
 // ==========================================
-app.get('/teachers', requireAuth, async (req, res) => {
+app.get('/teachers',  async (req, res) => {
     try {
         // Fetch all teachers from Neon PostgreSQL database ordered by newest first
         const result = await pool.query('SELECT * FROM teachers ORDER BY id DESC');
