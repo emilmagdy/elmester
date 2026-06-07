@@ -37,6 +37,13 @@ app.use(session({
     cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 } // Session expires after 30 days (in milliseconds)
 }));
 
+// Middleware to [ass session data to all ejs views
+app.use((req, res, next) => {
+    res.locals.userSession = req.session;
+    next();
+});
+
+
 // Middleware to protect the route from unautherized  users
 const requireAuth = (req, res, next) => {
     if (req.session && req.session.userId) {
@@ -135,7 +142,14 @@ try{
         );
      req.session.userId = newUser.rows[0].id;
      req.session.userRole = newUser.rows[0].role;
-     res.redirect("/teachers");
+     req.session.save((err) => {
+            if (err) {
+                console.error("Session save error during registration:", err);
+                return res.status(500).send("Internal Server Error");
+            }
+            res.redirect("/teachers");
+        });
+
     } catch (err) {
         console.error("Error during signup registration:", err);
         res.status(500).send("Internal server error. Please try again later.");
@@ -168,12 +182,32 @@ app.get("/login", (req, res) => {
 
     req.session.userId = user.id;
     req.session.userRole = user.role;
-
-    res.redirect("/teachers");
+    req.session.save((err) => {
+            if (err) {
+                console.error("Session save error during login:", err);
+                return res.status(500).send("Internal Server Error");
+            }
+            res.redirect("/teachers")
+        });
     } catch (err) {
         console.error("Error during login", err);
         res.status(500).send("Internal Server error. Please try again later");
     }
+});
+
+// ===========================================
+// 9. User Logout Action Route (GET)
+// ===========================================
+app.get("/logout", (req, res) => {
+    // Destroy the session in the server and clear the browser cookie
+    req.session.destroy((err) => {
+        if (err) {
+            console.error("Error destroying session during logout:", err);
+            return res.status(500).send("Failed to log out smoothly.");
+        }
+        res.clearCookie("connect.sid"); // Clear the default express-session cookie ID
+        res.redirect("/"); // Redirect back to the universal landing homepage
+    });
 });
 
 
