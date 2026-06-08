@@ -195,9 +195,9 @@ app.get("/login", (req, res) => {
     }
 });
 
-// ===========================================
+// ==================================
 // 9. User Logout Action Route (GET)
-// ===========================================
+// ==================================
 app.get("/logout", (req, res) => {
     // Destroy the session in the server and clear the browser cookie
     req.session.destroy((err) => {
@@ -210,9 +210,29 @@ app.get("/logout", (req, res) => {
     });
 });
 
-// ==========================================
-// Get route for render
+// ====================================================================
+// POST route to send the review into the reviews tabke in the database
+// =====================================================================
 
+app.post("/teachers/:id/review" ,requireAuth, async (req, res) => {
+    const teacher_id = req.params.id;
+    const student_id = req.session.userId;
+    const { rating, review_text } = req.body;
+    
+    try {
+        const checkQuery = "SELECT * FROM reviews WHERE teacher_id=$1 AND student_id = $2";
+        const existingReview = await pool.query(checkQuery, [teacher_id,student_id]);
+        if (existingReview.rows.length > 0) {
+           return  res.status(400).send("لا يمكن ارسال اكثر من تقييم واحد لكل مدرس")
+        } 
+        const queryText = "INSERT INTO reviews (teacher_id, student_id, rating , review_text) VALUES ($1, $2, $3, $4)";
+        const review_entry = await pool.query(queryText, [teacher_id, student_id,rating,review_text]);
+        res.redirect("/teachers");
+    } catch (err){
+        console.error(err);
+        res.status(400).send("Error during saving review");
+    }
+});
 
 
 // Start the server and listen on the specified port
