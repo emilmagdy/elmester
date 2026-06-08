@@ -210,6 +210,9 @@ app.get("/logout", (req, res) => {
     });
 });
 
+// ==========================================
+// Get route for render
+
 
 
 // Start the server and listen on the specified port

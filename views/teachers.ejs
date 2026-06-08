@@ -63,6 +63,29 @@
                 ✍️ إضافة تقييم
             </a>
         </div>
+        <div class="mt-3 p-2 bg-light rounded border">
+    <h6 class="text-secondary mb-2" style="font-size: 0.9rem;">إضافة تقييمك:</h6>
+    
+    <form action="/teachers/<%= teacher.id %>/review" method="POST">
+        
+        <div class="mb-2">
+            <select name="rating" class="form-select form-select-sm" required>
+                <option value="" disabled selected>اختر التقييم (من 1 إلى 5)</option>
+                <option value="5">⭐⭐⭐⭐⭐ ممتاز (5)</option>
+                <option value="4">⭐⭐⭐⭐ جيد جداً (4)</option>
+                <option value="3">⭐⭐⭐ جيد (3)</option>
+                <option value="2">⭐⭐ مقبول (2)</option>
+                <option value="1">⭐ ضعيف (1)</option>
+            </select>
+        </div>
+
+        <div class="mb-2">
+            <textarea name="review_text" class="form-control form-control-sm" rows="2" placeholder="اكتب رأيك في المدرس هنا (اختياري)..." maxlength="500"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-sm w-100">إرسال التقييم</button>
+    </form>
+</div>
 
     </div>
 </div>
