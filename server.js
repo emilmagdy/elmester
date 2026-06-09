@@ -234,6 +234,39 @@ app.post("/teachers/:id/review" ,requireAuth, async (req, res) => {
     }
 });
 
+// ====================================================================
+// 11. GET Route for viewing the reviews for each teacher in a new page 
+// ====================================================================
+
+app.get("/teachers/:id", async (req, res) => {
+    const teacher_id = req.params.id;
+    
+    try {
+        const teacherQuery = "SELECT * FROM teachers WHERE id = $1";
+        const teacherResult = await pool.query(teacherQuery, [teacher_id]);
+        
+        if (teacherResult.rows.length === 0) {
+            return res.status(404).send("المدرس غير موجود");
+        }
+
+        const reviewsQuery = `
+            SELECT reviews.*, users.name as student_name 
+            FROM reviews 
+            INNER JOIN users ON reviews.student_id = users.id 
+            WHERE reviews.teacher_id = $1 AND reviews.status = 'approved'
+        `;
+        const reviewsResult = await pool.query(reviewsQuery, [teacher_id]);
+
+        res.render("teacher-reviews", { 
+            teacher: teacherResult.rows[0], 
+            reviews: reviewsResult.rows       
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error fetching teacher details and reviews");
+    }
+});
 
 // Start the server and listen on the specified port
 app.listen(PORT, () => {
