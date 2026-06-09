@@ -66,10 +66,16 @@ app.get('/', (req, res) => {
 // ==========================================
 app.get('/teachers',  async (req, res) => {
     try {
-        // Fetch all teachers from Neon PostgreSQL database ordered by newest first
-        const result = await pool.query('SELECT * FROM teachers ORDER BY id DESC');
+        // Fetch all teachers from Neon PostgreSQL database and calculating there averge review  rating
+        const result = await pool.query(`
+            SELECT teachers.*,
+                   COALESCE(ROUND(AVG(reviews.rating), 1), 0) as avg_rating ,
+                   COUNT(reviews.id) as total_reviews
+            FROM teachers 
+            LEFT JOIN reviews ON teachers.id = reviews.teacher_id AND reviews.status = 'approved'
+            GROUP BY teachers.id`);
         
-        // Pass the database rows to teachers-list.ejs view
+        // Pass the database rows to teachers.ejs view
         res.render('teachers', { teachers: result.rows }); 
     } catch (err) {
         console.error("Database fetch error:", err);
@@ -243,19 +249,17 @@ app.get("/teachers/:id", async (req, res) => {
     
     try {
         const teacherQuery = "SELECT * FROM teachers WHERE id = $1";
-        const teacherResult = await pool.query(teacherQuery, [teacher_id]);
+        const reviewsQuery = `
+            SELECT * FROM reviews 
+            WHERE teacher_id = $1 AND status = 'approved'
+        `;
+        const [teacherResult, reviewsResult] = await Promise.all([
+            pool.query(teacherQuery, [teacher_id]),
+            pool.query(reviewsQuery, [teacher_id])]);
         
         if (teacherResult.rows.length === 0) {
             return res.status(404).send("المدرس غير موجود");
         }
-
-        const reviewsQuery = `
-            SELECT reviews.*, users.name as student_name 
-            FROM reviews 
-            INNER JOIN users ON reviews.student_id = users.id 
-            WHERE reviews.teacher_id = $1 AND reviews.status = 'approved'
-        `;
-        const reviewsResult = await pool.query(reviewsQuery, [teacher_id]);
 
         res.render("teacher-reviews", { 
             teacher: teacherResult.rows[0], 
