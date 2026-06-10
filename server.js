@@ -47,7 +47,7 @@ app.use((req, res, next) => {
 // Middleware to protect the route from unautherized  users
 const requireAuth = (req, res, next) => {
     if (req.session && req.session.userId) {
-        return next();
+        return next(req, res);
     } else {
         res.redirect("/login")
     };
@@ -148,6 +148,7 @@ try{
         );
      req.session.userId = newUser.rows[0].id;
      req.session.userRole = newUser.rows[0].role;
+     req.session.userName = newUser.rows[0].name;
      req.session.save((err) => {
             if (err) {
                 console.error("Session save error during registration:", err);
@@ -188,6 +189,7 @@ app.get("/login", (req, res) => {
 
     req.session.userId = user.id;
     req.session.userRole = user.role;
+    req.session.userName = user.name;
     req.session.save((err) => {
             if (err) {
                 console.error("Session save error during login:", err);

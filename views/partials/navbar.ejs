@@ -19,7 +19,7 @@
             
             <div class="d-flex gap-2">
                 <% if(typeof userSession !== 'undefined' && userSession && userSession.userId) { %>
-                <span class="text-light align-self-center me-2 small">مرحباً بك </span>
+                <span class="text-light align-self-center me-2 small">مرحباً بك  <%= userSession.userName %></span>
                 <a href="/logout" class="btn btn-danger btn-sm px-3 fw-bold"> تسجيل خروج</a>
                 <% } else { %>
                 <a href="/login" class="btn btn-outline-light btn-sm px-3">تسجيل الدخول</a>
