@@ -1,5 +1,56 @@
- <footer class="bg-dark text-white text-center py-4 mt-5">
-        <div class="container">
-            <p class="mb-0 small">&copy; 2026 منصة مستشارك التعليمية - جميع الحقوق محفوظة د. إميل مجدي</p>
+<footer class="bg-dark text-white pt-5 pb-3 mt-5 border-top border-secondary">
+    <div class="container">
+        <div class="row g-4 text-end"> <div class="col-lg-4 col-md-6">
+                <h5 class="fw-bold mb-3 text-primary">منصة مستشارك 🎓</h5>
+                <p class="text-white-50 small lh-lg">
+                    منصة تعليمية متكاملة تهدف إلى ربط الطلاب بأفضل المدرسين، وتمكين أولياء الأمور من تقييم التجربة التعليمية بكل شفافية ودقة لدعم مستقبل أبنائنا.
+                </p>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <h5 class="fw-bold mb-3 text-white">روابط سريعة</h5>
+                <ul class="list-unstyled p-0 m-0 small">
+                    <li class="mb-2">
+                        <a href="/teachers" class="text-white-50 text-decoration-none hover-link">🔍 قائمة المدرسين</a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="/login" class="text-white-50 text-decoration-none hover-link">🔑 تسجيل الدخول</a>
+                    </li>
+                    <li>
+                        <a href="/register" class="text-white-50 text-decoration-none hover-link">📝 إنشاء حساب جديد</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-lg-4 col-md-10">
+                <h5 class="fw-bold mb-3 text-white">الدعم الفني</h5>
+                <p class="text-white-50 small mb-2">💡 إذا واجهتك أي مشكلة، لا تتردد في التواصل معنا.</p>
+                <p class="text-white small mb-0 fw-semibold">
+                    📧 البريد الإلكتروني: <span class="text-primary">support@mostashark.com</span>
+                </p>
+            </div>
+
         </div>
-    </footer>
+
+        <hr class="bg-secondary my-4 opacity-25">
+
+        <div class="row align-items-center">
+            <div class="col-md-12 text-center">
+                <p class="text-white-50 small mb-0 font-monospace">
+                    &copy; <%= new Date().getFullYear() %> منصة مستشارك التعليمية. جميع الحقوق محفوظة.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<style>
+    .hover-link {
+        transition: color 0.2s ease-in-out, padding-right 0.2s ease-in-out;
+    }
+    .hover-link:hover {
+        color: #0d6efd !important; /* يتحول للأزرق بوضوح عند الوقوف عليه */
+        text-decoration: underline !important;
+        padding-right: 4px; /* حركة تباعد خفيفة لإعطاء طابع تفاعلي */
+    }
+</style>

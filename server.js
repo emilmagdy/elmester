@@ -47,7 +47,7 @@ app.use((req, res, next) => {
 // Middleware to protect the route from unautherized  users
 const requireAuth = (req, res, next) => {
     if (req.session && req.session.userId) {
-        return next(req, res);
+        return next();
     } else {
         res.redirect("/login")
     };
@@ -65,18 +65,44 @@ app.get('/', (req, res) => {
 // 2. Teachers List Route
 // ==========================================
 app.get('/teachers',  async (req, res) => {
+    const { subject, sort } = req.query;
     try {
-        // Fetch all teachers from Neon PostgreSQL database and calculating there averge review  rating
-        const result = await pool.query(`
-            SELECT teachers.*,
-                   COALESCE(ROUND(AVG(reviews.rating), 1), 0) as avg_rating ,
-                   COUNT(reviews.id) as total_reviews
-            FROM teachers 
-            LEFT JOIN reviews ON teachers.id = reviews.teacher_id AND reviews.status = 'approved'
-            GROUP BY teachers.id`);
+        let queryText = `
+            SELECT t.*,
+                   COALESCE(ROUND(AVG(r.rating), 1), 0.0) as avg_rating ,
+                   COUNT(r.id) as total_reviews
+            FROM teachers t
+            LEFT JOIN reviews r ON t.id = r.teacher_id AND r.status = 'approved'
+            `;
         
+        const queryParams = []
+
+        if (subject && subject !== "all") {
+            queryText += " WHERE t.subject = $1";
+            queryParams.push(subject);
+        };
+        queryText += " GROUP BY t.id";
+
+        if (sort === "rating_desc") {
+            queryText += " ORDER BY avg_rating DESC , total_reviews DESC";
+        } else if (sort === "rating_asc") {
+            queryText += " ORDER BY avg_rating ASC , total_reviews DESC";
+        } else {
+            queryText += " ORDER BY t.name ASC";
+        };
+
+        const [result,subjectRows ]= await Promise.all([
+            pool.query(queryText,queryParams),
+            pool.query("SELECT DISTINCT subject FROM teachers ORDER BY subject")]);
+        const subjectList = subjectRows.rows.map(row => row.subject);
+
         // Pass the database rows to teachers.ejs view
-        res.render('teachers', { teachers: result.rows }); 
+        res.render('teachers', {
+             teachers: result.rows,
+             selectedSort: sort || "default",
+             selectedSubject: subject || "all",
+             subjects : subjectList
+             }); 
     } catch (err) {
         console.error("Database fetch error:", err);
         res.status(500).send("Server Error: Status 500 - Failed to load teachers list");
@@ -134,9 +160,9 @@ app.get("/register", (req,res) => {
 // ===========================================================
 
 app.post("/register", async (req,res) =>{
-    const {name, email , password ,grade } = req.body;
+    let {name, email , password ,grade } = req.body;
 try{
-    
+    email = email.trim().toLowerCase()
     const exits = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
     if (exits.rows.length > 0) {
         return res.status(400).send("This email is already registered. Please log in ")
@@ -175,7 +201,8 @@ app.get("/login", (req, res) => {
 // POST Route for sending the login credntials
 // ===========================================
  app.post("/login", async (req, res) => {
-    const {email, password} = req.body;
+    let {email, password} = req.body;
+    email = email.trim().toLowerCase()
     try {
         const result = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
         if (result.rows.length === 0) {
