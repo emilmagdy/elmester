@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt")
 const express = require('express');
 const { Pool } = require('pg');
 const app = express();
+const flash = require("connect-flash")
 const PORT = process.env.PORT || 3000;
 
 // Connect to the cloud database (Neon) using the connection string
@@ -37,6 +38,14 @@ app.use(session({
     cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 } // Session expires after 30 days (in milliseconds)
 }));
 
+app.use(flash());
+
+app.use((req, res, next) => {
+    res.locals.success_msg = req.flash("success_msg");
+    res.locals.error_msg = req.flash("error_msg");
+    next()
+});
+
 // Middleware to [ass session data to all ejs views
 app.use((req, res, next) => {
     res.locals.userSession = req.session;
@@ -49,6 +58,7 @@ const requireAuth = (req, res, next) => {
     if (req.session && req.session.userId) {
         return next();
     } else {
+        req.flash("error_msg", "برجاء تسجيل الدخول اولا")
         res.redirect("/login")
     };
 };
@@ -64,7 +74,7 @@ app.get('/', (req, res) => {
 // ==========================================
 // 2. Teachers List Route
 // ==========================================
-app.get('/teachers', async (req, res) => {
+app.get('/teachers', async (req, res, next) => {
     const { subject, sort } = req.query;
     try {
         let queryText = `
@@ -126,7 +136,7 @@ app.get("/admin-insert", (req, res) => {
 // Post Route : To send the form data into the database
 // ====================================================
 
-app.post("/admin-insert", async (req, res) => {
+app.post("/admin-insert", async (req, res, next) => {
     // Get the secret key from the URL Parameters
     const secretKey = req.query.secret;
     // Double Check to prevent direct attacks
@@ -158,17 +168,18 @@ app.get("/register", (req, res) => {
 // POST Route for saving the registrion data into the database
 // ===========================================================
 
-app.post("/register", async (req, res) => {
+app.post("/register", async (req, res, next) => {
     let { name, email, password, grade } = req.body;
     try {
         email = email.trim().toLowerCase()
         const exits = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
         if (exits.rows.length > 0) {
-            return res.status(400).send("This email is already registered. Please log in ")
+            req.flash("error_msg", "هذا البريد الالكترونى مسجل من قبل برجاء تسجيل الدخول")
+            return res.redirect("/login")
         }
         const hashedPassword = await bcrypt.hash(password, 10)
         const newUser = await pool.query(
-            'INSERT INTO users (name, email, password_hash, grade) VALUES ($1, $2, $3, $4) RETURNING id, role',
+            'INSERT INTO users (name, email, password_hash, grade) VALUES ($1, $2, $3, $4) RETURNING id, role,name',
             [name, email, hashedPassword, grade]
         );
         req.session.userId = newUser.rows[0].id;
@@ -176,9 +187,9 @@ app.post("/register", async (req, res) => {
         req.session.userName = newUser.rows[0].name;
         req.session.save((err) => {
             if (err) {
-                console.error("Session save error during registration:", err);
-                return res.status(500).send("Internal Server Error");
+                return next(err)
             }
+            req.flash("success_msg", "لقد تم انشاء الحساب بنجاح برجاء تسجيل الدخول")
             res.redirect("/teachers");
         });
     } catch (err) {
@@ -197,18 +208,20 @@ app.get("/login", (req, res) => {
 // ===========================================
 // POST Route for sending the login credntials
 // ===========================================
-app.post("/login", async (req, res) => {
+app.post("/login", async (req, res, next) => {
     let { email, password } = req.body;
     email = email.trim().toLowerCase()
     try {
         const result = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
         if (result.rows.length === 0) {
-            return res.status(400).send("Invalid Email or Password");
+            req.flash("error_msg", "هذا البريد الالكترونى غير مشكل لدينا برجاء انشاء حساب ")
+            return res.redirect("/login")
         };
         const user = result.rows[0];
         const isMatch = await bcrypt.compare(password, user.password_hash);
         if (!isMatch) {
-            return res.status(400).send("Invalis Email or Password");
+            req.flash("error_msg", "البريد الاكترونى او كلمة السر غير صحيحه")
+            return res.redirect("/login")
         }
 
         req.session.userId = user.id;
@@ -216,9 +229,9 @@ app.post("/login", async (req, res) => {
         req.session.userName = user.name;
         req.session.save((err) => {
             if (err) {
-                console.error("Session save error during login:", err);
-                return res.status(500).send("Internal Server Error");
+                return next(err)
             }
+            req.flash("success_msg", `مرحباً بك مجدداً ${user.name}! تم تسجيل الدخول بنجاح. 🎉`);
             res.redirect("/teachers")
         });
     } catch (err) {
@@ -229,7 +242,7 @@ app.post("/login", async (req, res) => {
 // ==================================
 // 9. User Logout Action Route (GET)
 // ==================================
-app.get("/logout", (req, res) => {
+app.get("/logout", (req, res, next) => {
     // Destroy the session in the server and clear the browser cookie
     req.session.destroy((err) => {
         if (err) {
@@ -244,7 +257,7 @@ app.get("/logout", (req, res) => {
 // POST route to send the review into the reviews tabke in the database
 // =====================================================================
 
-app.post("/teachers/:id/review", requireAuth, async (req, res) => {
+app.post("/teachers/:id/review", requireAuth, async (req, res, next) => {
     const teacher_id = req.params.id;
     const student_id = req.session.userId;
     const { rating, review_text } = req.body;
@@ -253,13 +266,14 @@ app.post("/teachers/:id/review", requireAuth, async (req, res) => {
         const checkQuery = "SELECT * FROM reviews WHERE teacher_id=$1 AND student_id = $2";
         const existingReview = await pool.query(checkQuery, [teacher_id, student_id]);
         if (existingReview.rows.length > 0) {
-            return res.status(400).send("لا يمكن ارسال اكثر من تقييم واحد لكل مدرس")
+            req.flash("error_msg", "لا يمكن إرسال أكثر من تقييم واحد لكل مدرس.");
+            return res.redirect(`/teachers/${teacher_id}`);
         }
         const queryText = "INSERT INTO reviews (teacher_id, student_id, rating , review_text) VALUES ($1, $2, $3, $4)";
         const review_entry = await pool.query(queryText, [teacher_id, student_id, rating, review_text]);
         res.redirect("/teachers");
     } catch (err) {
-          next(err)
+        next(err)
     }
 });
 
@@ -267,7 +281,7 @@ app.post("/teachers/:id/review", requireAuth, async (req, res) => {
 // 11. GET Route for viewing the reviews for each teacher in a new page 
 // ====================================================================
 
-app.get("/teachers/:id", async (req, res) => {
+app.get("/teachers/:id", async (req, res, next) => {
     const teacher_id = req.params.id;
 
     try {
@@ -281,7 +295,9 @@ app.get("/teachers/:id", async (req, res) => {
             pool.query(reviewsQuery, [teacher_id])]);
 
         if (teacherResult.rows.length === 0) {
-            return res.status(404).send("المدرس غير موجود");
+            const err = new Error("المدرس غير موجود أو تم حذفه");
+            err.status = 404;
+            return next(err);
         }
 
         res.render("teacher-reviews", {
