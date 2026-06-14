@@ -6,7 +6,28 @@ const express = require('express');
 const { Pool } = require('pg');
 const app = express();
 const flash = require("connect-flash")
+const cloudinary = require("cloudinary").v2;
+const multerCloudinaryStorage = require("multer-storage-cloudinary")
+const multer = require("multer");
 const PORT = process.env.PORT || 3000;
+
+cloudinary.config({
+    cloud_name: "dt2nyki6m",
+    api_key : "669692557294547",
+    api_secret : "t45ntYHCQn15icVCQsy6HMRKbsE"
+
+});
+
+const storage = new multerCloudinaryStorage.CloudinaryStorage({
+    cloudinary: cloudinary,
+    params : {
+        folder: "teachers_photos",
+        allowed_formats :["jpg", "jpeg", "png"],
+        transformation: [{width : 200 , height: 200 , crop: "limit" }]
+    }
+});
+
+const upload = multer({storage: storage})
 
 // Connect to the cloud database (Neon) using the connection string
 const pool = new Pool({
@@ -136,7 +157,7 @@ app.get("/admin-insert", (req, res) => {
 // Post Route : To send the form data into the database
 // ====================================================
 
-app.post("/admin-insert", async (req, res, next) => {
+app.post("/admin-insert", upload.single("photo_url"), async (req, res, next) => {
     // Get the secret key from the URL Parameters
     const secretKey = req.query.secret;
     // Double Check to prevent direct attacks
@@ -145,10 +166,22 @@ app.post("/admin-insert", async (req, res, next) => {
     };
     try {
         // Destructure Name and Subject constants from the form body
-        const { name, subject } = req.body;
+        const { name, subject, photo_url } = req.body;
+        const finalUrl = req.file && req.file.path ? req.file.path : null
+
+        let queryText
+        let queryParams
+
+        if (finalUrl) {
+            queryText = "INSERT INTO teachers (name,subject,photo_url) VALUES ($1, $2, $3)";
+                        queryParams = [name, subject, finalUrl]
+        } else {
+            queryText = "INSERT INTO teachers (name,subject) VALUES ($1, $2)";
+            queryParams = [name, subject];
+        }
         // Insert name and subject into the database
-        const queryText = "INSERT INTO teachers (name,subject) VALUES ($1, $2)"
-        await pool.query(queryText, [name, subject]);
+
+        await pool.query(queryText, queryParams);
         // Success : Redirect to hte homepage
         res.redirect("/")
     } catch (err) {
