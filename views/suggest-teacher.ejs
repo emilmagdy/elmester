@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة مستشارك - تقييمات المدرس</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #f8f9fa !important;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .star-rating {
+            color: #ffc107;
+            font-size: 1.2rem;
+        }
+        .teacher-profile-card {
+            border-right: 5px solid #0d6efd; /* حافة زرقاء ديكورية متناسقة مع الهوية */
+        }
+    </style>
+</head>
+<body dir="rtl">
+<%- include('partials/header') %> 
+<div class="container my-5" style="min-height: 70vh;">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-5">
+                    <h2 class="card-title text-center mb-3" style="font-family: 'Cairo', sans-serif;">💡 اقترح مدرس جديد</h2>
+                    <p class="text-muted text-center small mb-4">شايف مدرس شاطر ومش لاقيه في المنصة؟ اكتب بياناته واحنا هنتواصل معاه فوراً!</p>
+                    
+                    <form action="/suggest-teacher" method="POST">
+                        <div class="mb-3">
+                            <label for="name" class="form-label text-start d-block">اسم المدرس:</label>
+                            <input type="text" class="form-control" id="name" name="name" required placeholder="مثال: مستر محمد علي">
+                        </div>
+                        <div class="mb-3">
+                            <label for="subject" class="form-label text-start d-block">المادة الدراسية:</label>
+                            <input type="text" class="form-control" id="subject" name="subject" required placeholder="مثال: فيزياء ثانوية عامة">
+                        </div>
+                        <div class="mb-3">
+                            <label for="city" class="form-label text-start d-block">المحافظة / المدينة (اختياري):</label>
+                            <input type="text" class="form-control" id="city" name="city" placeholder="مثال: القاهرة">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-2 mt-2 fw-bold">إرسال الاقتراح 🚀</button>
+                    </form>
+                    
+                    <div class="text-center mt-4">
+                        <a href="/teachers" class="text-decoration-none small">⬅️ العودة لصفحة المدرسين</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %> ```
+
+
