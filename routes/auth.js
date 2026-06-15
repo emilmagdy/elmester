@@ -1,48 +1,104 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
+const pool = require("../db");
 
-// Pass the database pool dependency into the routing module
-module.exports = (pool) => {
 
-    // GET: Render the signup registration page
-    router.get('/signup', (req, res) => {
-        res.render('signup'); 
-    });
+// ===========================================
+// GET Route for renderign the register page
+// ===========================================
 
-    // POST: Handle the registration form submission
-    router.post('/signup', async (req, res) => {
-        const { name, email, password, grade } = req.body;
+router.get("/register", (req, res) => {
+    res.render("register")
+});
 
-        try {
-            // 1. Check if the email already exists in the database
-            const userExists = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-            if (userExists.rows.length > 0) {
-                return res.status(400).send('This email is already registered. Please log in.');
-            }
+// ===========================================================
+// POST Route for saving the registrion data into the database
+// ===========================================================
 
-            // 2. Hash the password using bcrypt with 10 salt rounds for security
-            const hashedPassword = await bcrypt.hash(password, 10);
-
-            // 3. Insert the new user data into the database
-            const newUser = await pool.query(
-                'INSERT INTO users (name, email, password_hash, grade) VALUES ($1, $2, $3, $4) RETURNING id, role',
-                [name, email, hashedPassword, grade]
-            );
-
-            // 4. Automatically log the user in by initializing the session variables
-            req.session.userId = newUser.rows[0].id;
-            req.session.userRole = newUser.rows[0].role;
-
-            // 5. Redirect the student directly to the teachers catalog page
-            res.redirect('/teachers');
-
-        } catch (err) {
-            console.error("Error during signup execution:", err);
-            res.status(500).send("Internal server error. Please try again later.");
+router.post("/register", async (req, res, next) => {
+    let { name, email, password, grade } = req.body;
+    try {
+        email = email.trim().toLowerCase()
+        const exits = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+        if (exits.rows.length > 0) {
+            req.flash("error_msg", "هذا البريد الالكترونى مسجل من قبل برجاء تسجيل الدخول")
+            return res.redirect("/login")
         }
-    });
+        const hashedPassword = await bcrypt.hash(password, 10)
+        const newUser = await pool.query(
+            'INSERT INTO users (name, email, password_hash, grade) VALUES ($1, $2, $3, $4) RETURNING id, role,name',
+            [name, email, hashedPassword, grade]
+        );
+        req.session.userId = newUser.rows[0].id;
+        req.session.userRole = newUser.rows[0].role;
+        req.session.userName = newUser.rows[0].name;
+        req.session.save((err) => {
+            if (err) {
+                return next(err)
+            }
+            req.flash("success_msg", "لقد تم انشاء الحساب بنجاح برجاء تسجيل الدخول")
+            res.redirect("/teachers");
+        });
+    } catch (err) {
+        next(err)
+    }
+});
 
-    // Return the configured router instance
-    return router;
-};
+// ======================================
+// GET Route for rendering the login page
+// ======================================  
+
+router.get("/login", (req, res) => {
+    res.render("login")
+});
+
+// ===========================================
+// POST Route for sending the login credntials
+// ===========================================
+router.post("/login", async (req, res, next) => {
+    let { email, password } = req.body;
+    email = email.trim().toLowerCase()
+    try {
+        const result = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+        if (result.rows.length === 0) {
+            req.flash("error_msg", "هذا البريد الالكترونى غير مشكل لدينا برجاء انشاء حساب ")
+            return res.redirect("/login")
+        };
+        const user = result.rows[0];
+        const isMatch = await bcrypt.compare(password, user.password_hash);
+        if (!isMatch) {
+            req.flash("error_msg", "البريد الاكترونى او كلمة السر غير صحيحه")
+            return res.redirect("/login")
+        }
+
+        req.session.userId = user.id;
+        req.session.userRole = user.role;
+        req.session.userName = user.name;
+        req.session.save((err) => {
+            if (err) {
+                return next(err)
+            }
+            req.flash("success_msg", `مرحباً بك مجدداً ${user.name}! تم تسجيل الدخول بنجاح. 🎉`);
+            res.redirect("/teachers")
+        });
+    } catch (err) {
+        next(err)
+    }
+});
+
+// ==================================
+// 9. User Logout Action Route (GET)
+// ==================================
+router.get("/logout", (req, res, next) => {
+    // Destroy the session in the server and clear the browser cookie
+    req.session.destroy((err) => {
+        if (err) {
+            return next(err)
+        }
+        res.clearCookie("connect.sid"); // Clear the default express-session cookie ID
+        res.redirect("/"); // Redirect back to the universal landing homepage
+    });
+});
+
+module.exports = router;
