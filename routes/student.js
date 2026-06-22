@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../db");
-const requireAuth = require("./authMiddleware");
+const requireAuth = require("../middlewares/authMiddleware");
 
 // ===================
 // 1. Home Page Route

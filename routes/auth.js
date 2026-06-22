@@ -1,7 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
+const crypto = require('crypto')
 const pool = require("../db");
+const { sendVerificationEmail } = require('../utils/mailer')
 
 
 // ===========================================
@@ -26,24 +28,49 @@ router.post("/register", async (req, res, next) => {
             return res.redirect("/login")
         }
         const hashedPassword = await bcrypt.hash(password, 10)
-        const newUser = await pool.query(
-            'INSERT INTO users (name, email, password_hash, grade) VALUES ($1, $2, $3, $4) RETURNING id, role,name',
-            [name, email, hashedPassword, grade]
+
+        const verificationToken = crypto.randomBytes(32).toString("hex");
+
+        const tokenExpires = new Date();
+        tokenExpires.setHours(tokenExpires.getHours() + 24);
+
+        await pool.query(
+            'INSERT INTO users (name, email, password_hash, grade, verification_token, token_expires) VALUES ($1, $2, $3, $4, $5, $6) ',
+            [name, email, hashedPassword, grade, verificationToken, tokenExpires]
         );
-        req.session.userId = newUser.rows[0].id;
-        req.session.userRole = newUser.rows[0].role;
-        req.session.userName = newUser.rows[0].name;
-        req.session.save((err) => {
-            if (err) {
-                return next(err)
-            }
-            req.flash("success_msg", "لقد تم انشاء الحساب بنجاح برجاء تسجيل الدخول")
-            res.redirect("/teachers");
-        });
+        await sendVerificationEmail(email, verificationToken)
+        req.flash("success_msg" , "تم ارسال رابط التفعيل الى بريدك الاكترونى ")
+        res.redirect('/login')
     } catch (err) {
         next(err)
     }
 });
+
+// ================================
+// GET Route for email verification
+// ================================
+
+router.get('/verification-email', async (req, res, next) => {
+    const token = req.query.token;
+    const currentTime = new Date()
+    try {
+        const userResult = await pool.query('SELECT * FROM users WHERE verification_token=$1', [token]);
+        if (userResult.rows.length > 0 && userResult.rows[0].token_expires > currentTime) {
+            const user = userResult.rows[0];
+            await pool.query('UPDATE users SET is_verified=TRUE, verification_token=NULL , token_expires=NULL WHERE id = $1', [user.id])
+            req.flash("success_msg", "تم تفعيل حسابك بنجاح")
+            return res.redirect('/login');
+        } else {
+            req.flash("error_msg", "رابط التفعيل غير صالح او انتهت صلاحيته");
+            return res.redirect("/login")
+        }
+    } catch (err) {
+        return next(err)
+    };
+
+
+})
+
 
 // ======================================
 // GET Route for rendering the login page
@@ -62,15 +89,21 @@ router.post("/login", async (req, res, next) => {
     try {
         const result = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
         if (result.rows.length === 0) {
-            req.flash("error_msg", "هذا البريد الالكترونى غير مشكل لدينا برجاء انشاء حساب ")
+            req.flash("error_msg", "هذا البريد الالكترونى غير مسجل لدينا برجاء انشاء حساب ")
             return res.redirect("/login")
         };
-        const user = result.rows[0];
+     const user = result.rows[0];
+        
         const isMatch = await bcrypt.compare(password, user.password_hash);
         if (!isMatch) {
             req.flash("error_msg", "البريد الاكترونى او كلمة السر غير صحيحه")
             return res.redirect("/login")
         }
+           
+        if (!user.is_verified) {
+            req.flash("error_msg", "لم يتم تفعيل الحساب برجاء التوجه الى البريد الالكترونى و الضفط على رابط التفعيل");
+            return res.redirect("/login")
+        };
 
         req.session.userId = user.id;
         req.session.userRole = user.role;
