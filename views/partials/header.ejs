@@ -10,10 +10,13 @@
             
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 p-0 d-flex gap-2">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="/">الرئيسية</a>
+                    <a class="nav-link <%= locals.currentPage && currentPage === 'index' ? 'active' : '' %>"  href="/">الرئيسية</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/teachers">المدرسين</a>
+                    <a class="nav-link  <%= locals.currentPage && currentPage === 'teachers' ? 'active' : '' %>"  href="/teachers">المدرسين</a>
+                </li>
+                  <li class="nav-item">
+                    <a class="nav-link  <%=  locals.currentPage && currentPage === 'suggest-teacher' ? 'active' : '' %>"  href="/suggest-teacher">ارشح لنا مدرس</a>
                 </li>
             </ul>
             

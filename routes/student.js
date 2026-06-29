@@ -8,7 +8,7 @@ const requireAuth = require("../middlewares/authMiddleware");
 // ===================
 router.get('/', (req, res) => {
     // Renders index.ejs which contains navigation buttons and platform features
-    res.render('index');
+    res.render('index', {currentPage : "index"});
 });
 
 // ==========================================
@@ -50,7 +50,8 @@ router.get('/teachers', async (req, res, next) => {
             teachers: result.rows,
             selectedSort: sort || "default",
             selectedSubject: subject || "all",
-            subjects: subjectList
+            subjects: subjectList,
+            currentPage :"teachers"
         });
     } catch (err) {
         next(err)
@@ -105,7 +106,8 @@ router.get("/teachers/:id", async (req, res, next) => {
         }
         res.render("teacher-reviews", {
             teacher: teacherResult.rows[0],
-            reviews: reviewsResult.rows
+            reviews: reviewsResult.rows,
+            currentPage: "teachers"
         });
     } catch (err) {
         next(err)
@@ -114,13 +116,13 @@ router.get("/teachers/:id", async (req, res, next) => {
 
 // GET Route for rendering the teaccher-suggestion form
 
-router.get("/suggest-teacher" ,(req, res) => {
-    res.render("suggest-teacher")
+router.get("/suggest-teacher",requireAuth ,(req, res) => {
+    res.render("suggest-teacher" ,{ currentPage: "suggest-teacher" })
 });
 
 // POST Route for sending the teaccher-suggestion to the teacher suggestion table in the database
 
-router.post("/suggest-teacher" , async(req, res, next) => {
+router.post("/suggest-teacher" , requireAuth, async(req, res, next) => {
     const {name, subject, city} = req.body;
     try {
         queryText = `
