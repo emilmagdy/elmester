@@ -16,9 +16,10 @@ const storage = new multerCloudinaryStorage.CloudinaryStorage({
     cloudinary: cloudinary,
     params : {
         folder: "teachers_photos",
-        allowed_formats :["jpg", "jpeg", "png"],
-        transformation: [{width : 200 , height: 200 , crop: "limit" }]
-    }
+        allowed_formats :["jpg", "jpeg", "png"]
+        
+    } ,
+    transformation: [{width : 200 , height: 200 , crop: "fill", gravity : "face" }]
 });
 
 const upload = multer({storage: storage})
@@ -50,18 +51,18 @@ router.post("/admin-insert", upload.single("photo_url"), async (req, res, next) 
     };
     try {
         // Destructure Name and Subject constants from the form body
-        const { name, subject } = req.body;
+        const { name, subject, facebook_url, website_url } = req.body;
         const finalUrl = req.file && req.file.path ? req.file.path : null
 
         let queryText
         let queryParams
 
         if (finalUrl) {
-            queryText = "INSERT INTO teachers (name,subject,photo_url) VALUES ($1, $2, $3)";
-                        queryParams = [name, subject, finalUrl]
+            queryText = "INSERT INTO teachers (name, subject, facebook_url, website_url, photo_url) VALUES ($1, $2, $3, $4, $5)";
+                        queryParams = [name, subject,facebook_url, website_url , finalUrl]
         } else {
-            queryText = "INSERT INTO teachers (name,subject) VALUES ($1, $2)";
-            queryParams = [name, subject];
+            queryText = "INSERT INTO teachers (name,subject, facebook_url, website_url) VALUES ($1, $2, $3, $4)";
+            queryParams = [name, subject, facebook_url, website_url];
         }
         // Insert name and subject into the database
         await pool.query(queryText, queryParams);
