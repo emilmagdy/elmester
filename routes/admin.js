@@ -51,18 +51,18 @@ router.post("/admin-insert", upload.single("photo_url"), async (req, res, next) 
     };
     try {
         // Destructure Name and Subject constants from the form body
-        const { name, subject, facebook_url, website_url } = req.body;
+        const { name, subject, facebook_url, website_url, youtube_url } = req.body;
         const finalUrl = req.file && req.file.path ? req.file.path : null
 
         let queryText
         let queryParams
 
         if (finalUrl) {
-            queryText = "INSERT INTO teachers (name, subject, facebook_url, website_url, photo_url) VALUES ($1, $2, $3, $4, $5)";
-                        queryParams = [name, subject,facebook_url, website_url , finalUrl]
+            queryText = "INSERT INTO teachers (name, subject, facebook_url, website_url,youtube_url, photo_url) VALUES ($1, $2, $3, $4, $5, $6)";
+                        queryParams = [name, subject,facebook_url, website_url , youtube_url, finalUrl]
         } else {
-            queryText = "INSERT INTO teachers (name,subject, facebook_url, website_url) VALUES ($1, $2, $3, $4)";
-            queryParams = [name, subject, facebook_url, website_url];
+            queryText = "INSERT INTO teachers (name,subject, facebook_url, website_url, youtube_url) VALUES ($1, $2, $3, $4, $5)";
+            queryParams = [name, subject, facebook_url, website_url, youtube_url];
         }
         // Insert name and subject into the database
         await pool.query(queryText, queryParams);

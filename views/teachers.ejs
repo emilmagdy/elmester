@@ -95,7 +95,8 @@
                 <div class="col-lg-11">
 
                     <% teachers.forEach(teacher=> { %>
-                        <div class="card mb-4 shadow-sm border-0 bg-white p-4 teacher-card custom-border-right" style="background-color: #d7ccc8;">
+                        <div class="card mb-4 shadow-sm border-0 bg-white p-4 teacher-card custom-border-right"
+                            style="background-color: #d7ccc8;">
                             <div class="row align-items-center g-3">
 
                                 <div class="col-md-9">
@@ -131,6 +132,13 @@
                                                                 <i class="bi bi-globe"></i> المنصة الخاصة 🌐
                                                             </a>
                                                             <% } %>
+                                                                <% if (teacher.youtube_url) { %>
+                                                                    <a href="<%= teacher.youtube_url %>" target="_blank"
+                                                                        class="btn btn-outline-danger btn-sm rounded-pill py-0 px-2 fs-7 fw-semibold d-inline-flex align-items-center gap-1">
+                                                                        <i class="bi bi-youtube text-danger"></i> قناة
+                                                                        اليوتيوب 📺
+                                                                    </a>
+                                                                    <% } %>
                                             </div>
                                         </div>
 
