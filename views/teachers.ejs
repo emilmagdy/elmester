@@ -45,6 +45,7 @@
             <div class="mb-4">
                 <a href="/" class="btn btn-outline-secondary btn-sm">⬅️ العودة للصفحة الرئيسية</a>
             </div>
+            <%- include('partials/_messages') %>
 
             <div class="container my-4 p-0">
                 <div
@@ -165,6 +166,7 @@
                                     <div class="w-100 text-center">
                                         <% if (typeof userSession !=='undefined' && userSession && userSession.userId) {
                                             %>
+
                                             <div class="p-2 bg-light rounded border text-start">
                                                 <h6 class="text-secondary mb-2 fw-bold" style="font-size: 0.85rem;">
                                                     إضافة تقييمك:</h6>

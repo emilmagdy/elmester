@@ -67,7 +67,7 @@ router.post("/admin-insert", upload.single("photo_url"), async (req, res, next) 
         // Insert name and subject into the database
         await pool.query(queryText, queryParams);
         // Success : Redirect to hte homepage
-        res.redirect("/")
+        res.redirect("/admin-insert?secret=EmilPassword123")
     } catch (err) {
         next(err)
     }

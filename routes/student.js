@@ -8,7 +8,7 @@ const requireAuth = require("../middlewares/authMiddleware");
 // ===================
 router.get('/', (req, res) => {
     // Renders index.ejs which contains navigation buttons and platform features
-    res.render('index', {currentPage : "index"});
+    res.render('index', { currentPage: "index" });
 });
 
 // ==========================================
@@ -51,7 +51,7 @@ router.get('/teachers', async (req, res, next) => {
             selectedSort: sort || "default",
             selectedSubject: subject || "all",
             subjects: subjectList,
-            currentPage :"teachers"
+            currentPage: "teachers"
         });
     } catch (err) {
         next(err)
@@ -72,11 +72,17 @@ router.post("/teachers/:id/review", requireAuth, async (req, res, next) => {
         const existingReview = await pool.query(checkQuery, [teacher_id, student_id]);
         if (existingReview.rows.length > 0) {
             req.flash("error_msg", "لا يمكن إرسال أكثر من تقييم واحد لكل مدرس.");
-            return res.redirect(`/teachers/${teacher_id}`);
+            return res.redirect(`/teachers`);
         }
         const queryText = "INSERT INTO reviews (teacher_id, student_id, rating , review_text) VALUES ($1, $2, $3, $4)";
         const review_entry = await pool.query(queryText, [teacher_id, student_id, rating, review_text]);
-        res.redirect("/teachers");
+        req.flash("success_msg", "🙌 رائع! تم حفظ تقييمك بنجاح. رأيك يهمنا وبيساعد زمايلك يختاروا المدرس الصح، هيتم مراجعته ونشره في أسرع وقت.");
+        setTimeout(() => {
+            if (!res.headersSent) {
+                return res.redirect("/teachers");
+            }
+        }, 50);
+
     } catch (err) {
         next(err)
     }
@@ -116,20 +122,20 @@ router.get("/teachers/:id", async (req, res, next) => {
 
 // GET Route for rendering the teaccher-suggestion form
 
-router.get("/suggest-teacher",requireAuth ,(req, res) => {
-    res.render("suggest-teacher" ,{ currentPage: "suggest-teacher" })
+router.get("/suggest-teacher", requireAuth, (req, res) => {
+    res.render("suggest-teacher", { currentPage: "suggest-teacher" })
 });
 
 // POST Route for sending the teaccher-suggestion to the teacher suggestion table in the database
 
-router.post("/suggest-teacher" , requireAuth, async(req, res, next) => {
-    const {name, subject, city} = req.body;
+router.post("/suggest-teacher", requireAuth, async (req, res, next) => {
+    const { name, subject, city } = req.body;
     try {
         queryText = `
         INSERT INTO teacher_suggestions (name, subject, city) 
         VALUES ($1, $2, $3)
         `;
-        queryParams = [name , subject, city];
+        queryParams = [name, subject, city];
 
         await pool.query(queryText, queryParams);
         req.flash("success-msg", "تم استلام الاقتراح بنجاح ")

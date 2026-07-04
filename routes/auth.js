@@ -39,7 +39,7 @@ router.post("/register", async (req, res, next) => {
             [name, email, hashedPassword, grade, verificationToken, tokenExpires]
         );
         await sendVerificationEmail(email, verificationToken)
-        req.flash("success_msg" , "تم ارسال رابط التفعيل الى بريدك الاكترونى ")
+        req.flash("success_msg", "تم ارسال رابط التفعيل الى بريدك الاكترونى ")
         res.redirect('/login')
     } catch (err) {
         next(err)
@@ -59,7 +59,13 @@ router.get('/verification-email', async (req, res, next) => {
             const user = userResult.rows[0];
             await pool.query('UPDATE users SET is_verified=TRUE, verification_token=NULL , token_expires=NULL WHERE id = $1', [user.id])
             req.flash("success_msg", "تم تفعيل حسابك بنجاح")
-            return res.redirect('/login');
+            req.session.userId = user.id;
+            req.session.userName = user.name;
+            setTimeout(() => {
+                if (!res.headersSent) {
+                    return res.redirect('/teachers');
+                }
+            }, 50);
         } else {
             req.flash("error_msg", "رابط التفعيل غير صالح او انتهت صلاحيته");
             return res.redirect("/login")
@@ -92,14 +98,14 @@ router.post("/login", async (req, res, next) => {
             req.flash("error_msg", "هذا البريد الالكترونى غير مسجل لدينا برجاء انشاء حساب ")
             return res.redirect("/login")
         };
-     const user = result.rows[0];
-        
+        const user = result.rows[0];
+
         const isMatch = await bcrypt.compare(password, user.password_hash);
         if (!isMatch) {
             req.flash("error_msg", "البريد الاكترونى او كلمة السر غير صحيحه")
             return res.redirect("/login")
         }
-           
+
         if (!user.is_verified) {
             req.flash("error_msg", "لم يتم تفعيل الحساب برجاء التوجه الى البريد الالكترونى و الضفط على رابط التفعيل");
             return res.redirect("/login")

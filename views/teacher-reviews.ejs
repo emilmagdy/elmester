@@ -1,96 +1,128 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منصة مستشارك - تقييمات المدرس</title>
-    
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-    
+
     <style>
         body {
             background-color: #f8f9fa !important;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+
         .star-rating {
             color: #ffc107;
             font-size: 1.2rem;
         }
+
         .teacher-profile-card {
-            border-right: 5px solid #0d6efd; /* حافة زرقاء ديكورية متناسقة مع الهوية */
+            border-right: 5px solid #0d6efd;
+            /* حافة زرقاء ديكورية متناسقة مع الهوية */
         }
     </style>
 </head>
+
 <body dir="rtl">
-<%- include('partials/header') %>
+    <%- include('partials/header') %>
 
-<div class="container my-5">
-    
-    <div class="mb-4">
-        <a href="/teachers" class="btn btn-outline-secondary btn-sm">⬅️ العودة لقائمة المدرسين</a>
-    </div>
+        <div class="container my-5">
 
-    <div class="card shadow-sm border-0 mb-5 bg-white teacher-profile-card">
-        <div class="card-body p-4">
-            <div class="d-flex flex-column flex-sm-row align-items-center gap-4 text-center text-sm-start">
-                
-                <div class="flex-shrink-0">
-                    <img src="https://ui-avatars.com/api/?name=<%= encodeURIComponent(teacher.name) %>&background=0d6efd&color=fff&size=90" 
-                         class="rounded-circle border shadow-sm" 
-                         alt="<%= teacher.name %>" 
-                         style="width: 90px; height: 90px; object-fit: cover;">
-                </div>
-                
-                <div class="flex-grow-1">
-                    <h1 class="h3 fw-bold text-dark mb-2">الأستاذ: <%= teacher.name %></h1>
-                    <span class="badge bg-secondary-subtle text-secondary px-3 py-2 rounded-pill fs-7">
-                        📚 المادة الدراسية: <%= teacher.subject %>
-                    </span>
-                </div>
-                
+            <div class="mb-4">
+                <a href="/teachers" class="btn btn-outline-secondary btn-sm">⬅️ العودة لقائمة المدرسين</a>
             </div>
-        </div>
-    </div>
 
-    <h2 class="h5 fw-bold text-dark mb-4">⭐ آراء ومراجعات الطلاب المعتمدة:</h2>
+            <div class="card shadow-sm border-0 mb-5 bg-white teacher-profile-card">
+                <div class="card-body p-4">
+                    <div class="d-flex flex-column flex-sm-row align-items-center gap-4 text-center text-sm-start">
 
-    <% if (reviews.length === 0) { %>
-        <div class="alert alert-info text-center py-5 shadow-sm border-0" role="alert">
-            <h4 class="alert-heading fw-bold mb-2">لا توجد تقييمات بعد</h4>
-            <p class="mb-0 text-muted">هذا المدرس لم يتم نشر أي تقييمات معتمدة له حتى الآن.</p>
-        </div>
-    <% } else { %>
-        <div class="row g-3">
-            <% reviews.forEach(function(review) { %>
-                <div class="col-12">
-                    <div class="card shadow-sm border-0 bg-white mb-2">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <div>
-                                    <h5 class="fw-bold mb-1 text-primary fs-6"><%= review.student_name %></h5>
-                                    <small class="text-muted" style="font-size: 0.75rem;">✔️ تقييم معتمد</small>
-                                </div>
-                                <div class="star-rating">
-                                    <% for(let i = 1; i <= 5; i++) { %>
-                                        <% if (i <= review.rating) { %>
-                                            ★
-                                        <% } else { %>
-                                            ☆
-                                        <% } %>
-                                    <% } %>
-                                </div>
-                            </div>
-                            <p class="card-text text-dark small bg-light p-3 rounded-0 m-0" style="white-space: pre-line; line-height: 1.6;"><%= review.review_text %></p>
+                        <div class="flex-shrink-0">
+                            <img src="<%= teacher.photo_url %>" class="rounded border shadow-sm"
+                                alt="<%= teacher.name %>" style="width: 110px; height: 110px; object-fit: cover;">
                         </div>
+
+                        <div class="flex-grow-1">
+                            <h1 class="h3 fw-bold text-dark mb-2">الأستاذ: <%= teacher.name %>
+                            </h1>
+                            <span class="badge bg-secondary-subtle text-secondary px-3 py-2 rounded-pill fs-7">
+                                📚 المادة الدراسية: <%= teacher.subject %>
+                            </span>
+                        </div>
+                        <div class="d-flex flex-wrap justify-content-center justify-content-sm-start gap-2 mt-1">
+                            <% if (teacher.facebook_url) { %>
+                                <a href="<%= teacher.facebook_url %>" target="_blank"
+                                    class="btn btn-outline-primary btn-sm rounded-pill py-0 px-2 fs-7 fw-semibold">
+                                    <i class="bi bi-facebook"></i> صفحة المدرس 🔗
+                                </a>
+                                <% } %>
+                                    <% if (teacher.website_url) { %>
+                                        <a href="<%= teacher.website_url %>" target="_blank"
+                                            class="btn btn-outline-secondary btn-sm rounded-pill py-0 px-2 fs-7 fw-semibold">
+                                            <i class="bi bi-globe"></i> المنصة الخاصة 🌐
+                                        </a>
+                                        <% } %>
+                                            <% if (teacher.youtube_url) { %>
+                                                <a href="<%= teacher.youtube_url %>" target="_blank"
+                                                    class="btn btn-outline-danger btn-sm rounded-pill py-0 px-2 fs-7 fw-semibold d-inline-flex align-items-center gap-1">
+                                                    <i class="bi bi-youtube text-danger"></i> قناة
+                                                    اليوتيوب 📺
+                                                </a>
+                                                <% } %>
+                        </div>
+
                     </div>
                 </div>
-            <% }); %>
+            </div>
+
+            <h2 class="h5 fw-bold text-dark mb-4">⭐ آراء ومراجعات الطلاب المعتمدة:</h2>
+
+            <% if (reviews.length===0) { %>
+                <div class="alert alert-info text-center py-5 shadow-sm border-0" role="alert">
+                    <h4 class="alert-heading fw-bold mb-2">لا توجد تقييمات بعد</h4>
+                    <p class="mb-0 text-muted">هذا المدرس لم يتم نشر أي تقييمات معتمدة له حتى الآن.</p>
+                </div>
+                <% } else { %>
+                    <div class="row g-3">
+                        <% reviews.forEach(function(review) { %>
+                            <div class="col-12">
+                                <div class="card shadow-sm border-0 bg-white mb-2">
+                                    <div class="card-body p-4">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <div>
+                                                <h5 class="fw-bold mb-1 text-primary fs-6">
+                                                    <%= review.student_name %>
+                                                </h5>
+                                                <small class="text-muted" style="font-size: 0.75rem;">✔️ تقييم
+                                                    معتمد</small>
+                                            </div>
+                                            <div class="star-rating">
+                                                <% for(let i=1; i <=5; i++) { %>
+                                                    <% if (i <=review.rating) { %>
+                                                        ★
+                                                        <% } else { %>
+                                                            ☆
+                                                            <% } %>
+                                                                <% } %>
+                                            </div>
+                                        </div>
+                                        <p class="card-text text-dark small bg-light p-3 rounded-0 m-0"
+                                            style="white-space: pre-line; line-height: 1.6;">
+                                            <%= review.review_text %>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <% }); %>
+                    </div>
+                    <% } %>
         </div>
-    <% } %>
-</div>
 
-<%- include('partials/footer') %>
+        <%- include('partials/footer') %>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
