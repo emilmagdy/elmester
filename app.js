@@ -18,11 +18,14 @@ app.use(express.urlencoded({ extended: true }));
 
 // Configure session middleware to track logged-in users
 app.use(session({
-    secret: 'EmilSuperSecretKey2026', // Secret key to sign the session ID cookie
+    secret: process.env.SESSION_SECRET, // Secret key to sign the session ID cookie
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 } // Session expires after 30 days (in milliseconds)
-}));
+    cookie: { 
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+        httpOnly: true, // يحمي الكوكي من السرقة عبر حواسب المستخدمين (XSS)
+        secure: process.env.NODE_ENV === 'production' // الـ كوكي تعمل فقط عبر HTTPS في السيرفر الحي
+    }}));
 
 app.use(flash());
 

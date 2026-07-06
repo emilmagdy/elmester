@@ -6,9 +6,9 @@ const multer = require("multer");
 const pool = require("../db")
 
 cloudinary.config({
-    cloud_name: "dt2nyki6m",
-    api_key : "669692557294547",
-    api_secret : "t45ntYHCQn15icVCQsy6HMRKbsE"
+    cloud_name: process.env.CLOUDINARY_NAME,
+    api_key : process.env.CLOUDINARY_API_KET,
+    api_secret : process.env.CLOUDINARY_API_SECRET
 
 });
 
