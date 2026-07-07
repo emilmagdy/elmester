@@ -12,6 +12,7 @@ const studentRoutes = require("./routes/student")
 
 // Set EJS as the template engine
 app.set('view engine', 'ejs');
+app.set("trust proxy", 1);
 
 // Middleware to parse the URL Encoded data embedded in the form body
 app.use(express.urlencoded({ extended: true }));
@@ -24,7 +25,8 @@ app.use(session({
     cookie: { 
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
         httpOnly: true, // يحمي الكوكي من السرقة عبر حواسب المستخدمين (XSS)
-        secure: process.env.NODE_ENV === 'production' // الـ كوكي تعمل فقط عبر HTTPS في السيرفر الحي
+        secure: true, // الـ كوكي تعمل فقط عبر HTTPS في السيرفر الحي
+        sameSite: "lax"
     }}));
 
 app.use(flash());
