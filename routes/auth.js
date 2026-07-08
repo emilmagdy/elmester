@@ -38,9 +38,9 @@ router.post("/register", async (req, res, next) => {
             'INSERT INTO users (name, email, password_hash, grade, verification_token, token_expires) VALUES ($1, $2, $3, $4, $5, $6) ',
             [name, email, hashedPassword, grade, verificationToken, tokenExpires]
         );
-        await sendVerificationEmail(email, verificationToken)
-        req.flash("success_msg", "تم ارسال رابط التفعيل الى بريدك الاكترونى ")
-        res.redirect('/login')
+        
+        req.flash("success_msg", "تم انشاء الحساب بنجاح برجاء تسجيل الدخول ")
+        return res.redirect('/login')
     } catch (err) {
         next(err)
     }
