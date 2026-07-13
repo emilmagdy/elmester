@@ -10,6 +10,8 @@ const PORT = process.env.PORT || 3000
 const authRoutes = require("./routes/auth");
 const adminRoutes = require("./routes/admin");
 const studentRoutes = require("./routes/student")
+const indexRoutes = require("./routes/index")
+
 
 // Set EJS as the template engine
 app.set('view engine', 'ejs');
@@ -47,6 +49,8 @@ app.use((req, res, next) => {
 app.use("/", authRoutes);
 app.use("/", adminRoutes);
 app.use("/", studentRoutes);
+app.use("/", indexRoutes);
+
 
 app.use((req, res, next) => {
     const err = new Error("هذه الصفحه غير موجوده او تم حذفها");
