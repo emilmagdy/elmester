@@ -122,13 +122,13 @@ router.get("/teachers/:id", async (req, res, next) => {
 
 // GET Route for rendering the teaccher-suggestion form
 
-router.get("/suggest-teacher", requireAuth, (req, res) => {
+router.get("/suggest-teacher",  (req, res) => {
     res.render("suggest-teacher", { currentPage: "suggest-teacher" })
 });
 
 // POST Route for sending the teaccher-suggestion to the teacher suggestion table in the database
 
-router.post("/suggest-teacher", requireAuth, async (req, res, next) => {
+router.post("/suggest-teacher",  async (req, res, next) => {
     const { name, subject, city } = req.body;
     try {
         queryText = `

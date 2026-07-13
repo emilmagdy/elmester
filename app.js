@@ -14,6 +14,7 @@ const studentRoutes = require("./routes/student")
 // Set EJS as the template engine
 app.set('view engine', 'ejs');
 app.set("trust proxy", 1);
+app.use('/static', express.static('static'));
 
 // Middleware to parse the URL Encoded data embedded in the form body
 app.use(express.urlencoded({ extended: true }));
