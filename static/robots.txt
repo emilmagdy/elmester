@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Allow: /login
+Allow: /register
+Allow: /teachers
+Allow: /suggest-teacher
+Disallow: /admin/
+
+Sitemap: https://elmestar.com/sitemap.xml

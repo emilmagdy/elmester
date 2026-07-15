@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="محتار تختار المدرس الصح؟ منصة المستر هي أول منصة مصرية لتقييم مدرسي الثانوية العامة والبكالوريا بناءً على تجارب وآراء الطلاب الحقيقية.">
     <title>منصة المستر التعليمية - الرئيسية</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
@@ -46,27 +47,26 @@
     <%- include('partials/header') %>
         <div class="hero-section shadow-sm" style="padding: 20px 0; border-radius: 0 0 24px 24px;">
             <div class="container">
-                <div class="row align-items-center g-4 text-end">
+                <!-- تم تغيير text-end إلى text-center لتوسيط الصف بالكامل -->
+                <div class="row justify-content-center align-items-center g-4 text-center">
 
-                    <!-- العمود الأيمن: النصوص وأزرار التفاعل -->
-                    <div class="col-md-6 text-center text-md-start dir-rtl" style="text-align: right !important;">
-                        <h1 class="display-5 fw-bold mb-3">منصة المستر التعليمية 🎓</h1>
-                        <p class="mb-4 text-white fs-4 fw-normal" style="line-height: 1.8;">
+                    <!-- تم تغيير col-md-6 إلى col-lg-8 (أو col-12) لتوسيع مساحة النص عند التوسيط -->
+                    <!-- وتمت إزالة text-md-start وجعل التوسيط افتراضياً لجميع الشاشات -->
+                    <div class="col-lg-8 col-12 dir-rtl">
+                        <h1 class="display-5 fw-bold mb-3 text-center">منصة المستر التعليمية 🎓</h1>
+
+                        <p class="mb-4 text-white fs-4 fw-normal text-center" style="line-height: 1.8;">
                             محتار ومش عارف تختار المدرس الصح؟ <br>
                             <span class="fw-bold text-warning">المستر</span> هنا عشان يساعدك! <br>
                             أول منصة مصرية تتيح للطلاب تقييم المدرسين بكل صراحة، <br>
                             عشان تختار مدرسك الجاي بثقة وبناءً على تجارب حقيقية.
                         </p>
-                        <div class="mt-4">
-                            <a href="/teachers" class="btn btn-warning btn-lg fs-5 fw-bold shadow px-4 py-2">تصفح
-                                المدرسين و اضف تقييمك الآن 🔍</a>
-                        </div>
-                    </div>
 
-                    <!-- العمود الأيسر: الصورة المصغرة المدمجة -->
-                    <div class="col-md-6 text-center">
-                        <img src="/static/cover_photo.jpg" alt="غلاف منصة المستر" class="img-fluid rounded-3 shadow-lg"
-                            style="max-height: 280px; width: 100%; object-fit: cover;">
+                        <div class="mt-4 text-center">
+                            <a href="/teachers" class="btn btn-warning btn-lg fs-5 fw-bold shadow px-4 py-2">
+                                تصفح المدرسين و اضف تقييمك الآن 🔍
+                            </a>
+                        </div>
                     </div>
 
                 </div>
