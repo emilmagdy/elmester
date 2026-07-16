@@ -18,11 +18,8 @@ router.get('/teachers', async (req, res, next) => {
     const { subject, sort } = req.query;
     try {
         let queryText = `
-            SELECT t.*,
-                   COALESCE(ROUND(AVG(r.rating), 1), 0.0) as avg_rating ,
-                   COUNT(r.id) as total_reviews
+            SELECT *
             FROM teachers t
-            LEFT JOIN reviews r ON t.id = r.teacher_id AND r.status = 'approved'
             `;
 
         const queryParams = []
@@ -31,12 +28,10 @@ router.get('/teachers', async (req, res, next) => {
             queryText += " WHERE t.subject = $1";
             queryParams.push(subject);
         };
-        queryText += " GROUP BY t.id";
-
         if (sort === "rating_desc") {
-            queryText += " ORDER BY avg_rating DESC , total_reviews DESC";
+            queryText += " ORDER BY t.avg_rating DESC , t.total_reviews DESC";
         } else if (sort === "rating_asc") {
-            queryText += " ORDER BY avg_rating ASC , total_reviews DESC";
+            queryText += " ORDER BY t.avg_rating ASC , t.total_reviews DESC";
         } else {
             queryText += " ORDER BY t.name ASC";
         };
@@ -76,6 +71,19 @@ router.post("/teachers/:id/review", requireAuth, async (req, res, next) => {
         }
         const queryText = "INSERT INTO reviews (teacher_id, student_id, rating , review_text) VALUES ($1, $2, $3, $4)";
         const review_entry = await pool.query(queryText, [teacher_id, student_id, rating, review_text]);
+        const calculated_rating = await pool.query(`
+           WITH calculated_stats AS(
+           SELECT teacher_id,
+           COUNT(*) AS reviews_count,
+           ROUND(AVG(rating)::numeric,1) AS calc_rating
+           FROM reviews r 
+           WHERE teacher_id = $1
+           GROUP BY teacher_id )
+           UPDATE teachers t 
+           SET avg_rating = cs.calc_rating,
+               total_reviews = cs.reviews_count
+               FROM calculated_stats cs
+           WHERE t.id = cs.teacher_id` , [teacher_id])
         req.flash("success_msg", "🙌 رائع! تم حفظ تقييمك بنجاح. رأيك يهمنا وبيساعد زمايلك يختاروا المدرس الصح، هيتم مراجعته ونشره في أسرع وقت.");
         setTimeout(() => {
             if (!res.headersSent) {
