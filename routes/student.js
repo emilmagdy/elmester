@@ -6,9 +6,20 @@ const requireAuth = require("../middlewares/authMiddleware");
 // ===================
 // 1. Home Page Route
 // ===================
-router.get('/', (req, res) => {
-    // Renders index.ejs which contains navigation buttons and platform features
-    res.render('index', { currentPage: "index" });
+router.get('/', async (req, res, next) => {
+    try{
+    const topTeachers = await pool.query(`
+    SELECT * 
+    FROM teachers 
+    ORDER BY avg_rating DESC , total_reviews DESC
+    LIMIT 4`)
+     res.render('index',
+         { currentPage: "index",
+        teachers : topTeachers.rows});
+    } catch (err) {
+       return next(err)
+    }
+   
 });
 
 // ==========================================
