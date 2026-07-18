@@ -9,6 +9,18 @@ const pool = new Pool({
 
 const reviews_seeder = async () => {
     try {
+        const rate_2_Reviews = [
+            "الشرح سطحى جداً والمنصة كل شوية تقف، والمساعدين مفيش أي رد منهم على أسئلتنا للأسف.",
+            "المستر بيشرح بسرعة ومن غير تركيز، والواجبات كتير جداً على الفاضي ومفيش تصحيح ليها خالص.",
+            "التجربة سيئة، السعر غالي بزيادة ومفيش أي مراجعات أو اهتمام بنظام الامتحانات الجديد بصراحة.",
+            "الدعم الفني للمنصة منعدم والحصص بتتأخر بالأيام، والمساعدين أسلوبهم جاف جداً في التعامل مع الطلبة.",
+            "الشرح مش أد كده ومبيدخلش في تفاصيل المنهج، والمذكرات مليانة أخطاء ومفيش أي اهتمام.",
+            "مجهود ضعيف جداً من التيم، الحصة بتعلق ديماً وضيعت عليا وقت كتير ومفيش أي تعويض.",
+            "المستر بيزعق كتير وقت الحصة ومب نفهمش منه حاجة، والمتابعة مع ولي الأمر غايبة تماماً.",
+            "منصة معقدة وبطيئة، والمحتوى لا يستحق المبلغ المالي الكبير ده، تجربة محبطة ومش هجدد تاني.",
+            "الامتحانات الدورية تعجيزية ومالهاش علاقة بالشرح، والمساعدين بيتأخروا أسابيع في الرد على الواتساب.",
+            "غش في المواعيد وتأخير مستمر، والشرح كرواتة ومفيش حل أفكار كافية تضمن الدرجة النهائية."
+        ];
         const rate_3_Reviews = [
             "الشرح كويس ومبسط بس المشكلة في كثرة الواجبات والضغط الزيادة اللي ملوش لزمة.",
             "المستر ممتاز جداً في الشرح بس المساعدين معاملتهم محتاجة تتصلح وتكون أفضل من كده.",
@@ -38,70 +50,82 @@ const reviews_seeder = async () => {
             "المنصة سريعة جداً والشرح مبسط لأبعد حد، بفضل ربنا والمستر المادة بقت أسهل مادة عندي.",
             "المستر بيشرح من قلبه وكل أفكار الامتحان بيقولها في الحصة، مذكرات عبقرية وتنظيم عالمي.",
             "تجربة مثالية ومفيش غلطة، الشرح والحل والمتابعة مع ولي الأمر قمة في الاحترافية والأمانة.",
-            "شكراً يا مستر بجد على المجهود الأسطوري ده، الشرح يجنن والامتحانات بتخلينا وحوش في المادة.",
+            "شكراً يا مستر بجد على المجهود الأسطوري ده, الشرح يجنن والامتحانات بتخلينا وحوش في المادة.",
             "أسلوب الشرح ممتع جداً ومش بحس بالوقت، والمساعدين قمة في الذوق وبيردوا على أي سؤال.",
             "امتحانات الوزارة والنظام الجديد في جيبك مع المستر ده، مفيش فكرة بتفوتنا في الحصة خالص.",
             "المنصة منورة بوجود المستر، شرح وتلخيص وحل امتحانات شاملة، وفر عليا دروس خصوصية كتير بجد.",
             "تقييم خمس نجوم وقليل عليه كمان، مستر بجد محترم وبيراعي ربنا في كل طالب معاه.",
             "مستحيل تندم لو اشتركت معاه، شرح أسطوري ومراجعات نهائية بتديك الخلاصة اللي بتيجي في الامتحان."
         ];
-        const student_ids = await pool.query(`
-            SELECT id 
-            FROM users
-            ORDER BY id`)
-        const teacher_ids = await pool.query(`
-            SELECT id 
-            FROM teachers
-            ORDER BY id`)
+
+        const student_ids = await pool.query(`SELECT id FROM users ORDER BY id`);
+        const teacher_ids = await pool.query(`SELECT id FROM teachers ORDER BY id`);
+        
         let queryExpressions = [];
         let queryValues = [];
-        let valueIndex = 1
+        let valueIndex = 1;
+
         for (let student of student_ids.rows) {
             for (let teacher of teacher_ids.rows) {
-                let rating = Math.floor(Math.random() * (5 - 3 + 1)) + 3
-                let review = ""
-                if (rating == 3) {
-                    review = rate_3_Reviews[Math.floor(Math.random() * rate_3_Reviews.length)]
-                } else if (rating == 4) {
-                    review = rate_4_Reviews[Math.floor(Math.random() * rate_4_Reviews.length)]
-                } else {
-                    review = rate_5_Reviews[Math.floor(Math.random() * rate_5_Reviews.length)]
+                if (Math.random() > 0.4) {
+                    continue;
                 }
-                queryValues.push(teacher.id, student.id,review, rating)
-                queryExpressions.push(`($${valueIndex},$${valueIndex + 1},$${valueIndex +2},$${valueIndex + 3})`)
-                valueIndex += 4
-                  
+
+                let rating = 0;
+                let rand = Math.random();
+                let review = "";
+
+                if (rand < 0.60) {
+                    rating = 5;
+                    review = rate_5_Reviews[Math.floor(Math.random() * rate_5_Reviews.length)];
+                } else if (rand < 0.85) {
+                    rating = 4;
+                    review = rate_4_Reviews[Math.floor(Math.random() * rate_4_Reviews.length)];
+                } else if (rand < 0.95) {
+                    rating = 3;
+                    review = rate_3_Reviews[Math.floor(Math.random() * rate_3_Reviews.length)];
+                } else {
+                    rating = 2;
+                    review = rate_2_Reviews[Math.floor(Math.random() * rate_2_Reviews.length)];
+                }
+
+                queryValues.push(teacher.id, student.id, review, rating);
+                queryExpressions.push(`($${valueIndex},$${valueIndex + 1},$${valueIndex + 2},$${valueIndex + 3})`);
+                valueIndex += 4;
             }
         }
-        console.log(`${queryExpressions.join(", ")}`)
-        console.log(queryValues)
-        
-        const added_review = await pool.query(`
-                  INSERT INTO reviews (teacher_id,student_id,review_text,rating)
-                  VALUES ${queryExpressions.join(", ")}`, queryValues)
 
-        console.log ("reviews added succesfuly")
+        if (queryExpressions.length > 0) {
+            await pool.query(`
+                INSERT INTO reviews (teacher_id, student_id, review_text, rating)
+                VALUES ${queryExpressions.join(", ")}`, queryValues);
+            console.log("reviews added successfully");
+        } else {
+            console.log("No reviews generated due to randomness factor.");
+        }
+
         await pool.query(`
             WITH stats AS (
-            SELECT teacher_id,
-            COUNT(*) AS reviews_count,
-            ROUND(AVG(rating)::numeric,1) AS calc_rating
-            FROM reviews r 
-            GROUP BY teacher_id) 
+                SELECT teacher_id,
+                COUNT(*) AS reviews_count,
+                ROUND(AVG(rating)::numeric,1) AS calc_rating
+                FROM reviews r 
+                GROUP BY teacher_id
+            ) 
             UPDATE teachers 
             SET avg_rating = cs.calc_rating,
-            total_reviews = cs.reviews_count
+                total_reviews = cs.reviews_count
             FROM stats cs 
-            WHERE id = cs.teacher_id`)
-        console.log("averages and counts have been modified")
+            WHERE id = cs.teacher_id`);
+            
+        console.log("averages and counts have been modified");
 
     } catch (err) {
-
-        console.log(err)
+        console.log(err);
     } finally {
         await pool.end();
-        console.log("database connection closed succesfuly")
+        console.log("database connection closed successfully");
     }
 }
 
-reviews_seeder()
+reviews_seeder();
