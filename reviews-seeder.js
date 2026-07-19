@@ -64,6 +64,8 @@ const reviews_seeder = async () => {
         let queryExpressions = [];
         let queryValues = [];
         let valueIndex = 1;
+        let lastIndexes = {}
+        let chosenArray = []
 
         for (let student of student_ids.rows) {
             for (let teacher of teacher_ids.rows) {
@@ -74,20 +76,31 @@ const reviews_seeder = async () => {
                 let rating = 0;
                 let rand = Math.random();
                 let review = "";
+               
 
                 if (rand < 0.60) {
                     rating = 5;
-                    review = rate_5_Reviews[Math.floor(Math.random() * rate_5_Reviews.length)];
+                    chosenArray = rate_5_Reviews
+
                 } else if (rand < 0.85) {
                     rating = 4;
-                    review = rate_4_Reviews[Math.floor(Math.random() * rate_4_Reviews.length)];
+                    chosenArray = rate_4_Reviews
                 } else if (rand < 0.95) {
                     rating = 3;
-                    review = rate_3_Reviews[Math.floor(Math.random() * rate_3_Reviews.length)];
+                    chosenArray = rate_3_Reviews
                 } else {
                     rating = 2;
-                    review = rate_2_Reviews[Math.floor(Math.random() * rate_2_Reviews.length)];
+                    chosenArray = rate_2_Reviews
                 }
+                let key = `${teacher.id}_${rating}`
+                let newIndex = Math.floor(Math.random()* chosenArray.length )
+                if (lastIndexes[key] !== undefined && lastIndexes[key] === newIndex) {
+                    newIndex = (newIndex + 1) % chosenArray.length
+                }
+                lastIndexes[key] = newIndex
+                review = chosenArray[newIndex]
+
+              
 
                 queryValues.push(teacher.id, student.id, review, rating);
                 queryExpressions.push(`($${valueIndex},$${valueIndex + 1},$${valueIndex + 2},$${valueIndex + 3})`);
