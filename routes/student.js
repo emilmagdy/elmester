@@ -111,7 +111,7 @@ router.post("/teachers/:id/review", requireAuth, async (req, res, next) => {
 // 11. GET Route for viewing the reviews for each teacher in a new page 
 // ====================================================================
 
-router.get("/teachers/:id", async (req, res, next) => {
+router.get("/teachers/:id/:subject_slug/:study_type/:teacher_slug", async (req, res, next) => {
     const teacher_id = req.params.id;
 
     try {
