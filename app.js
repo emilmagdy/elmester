@@ -6,6 +6,8 @@ const express = require('express');
 const app = express();
 const flash = require("connect-flash")
 const PORT = process.env.PORT || 3000
+const isProduction = process.env.NODE_ENV === "production"
+const passaport = require('./utils/passport')
 
 const authRoutes = require("./routes/auth");
 const adminRoutes = require("./routes/admin");
@@ -30,10 +32,14 @@ app.use(session({
     cookie: { 
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true, 
-        secure: true, 
+        secure: isProduction, 
         sameSite: "lax"
     }
 }));
+
+app.use(passaport.initialize())
+app.use(passaport.session())
+
 app.use(flash());
 
 app.use((req, res, next) => {
@@ -43,7 +49,11 @@ app.use((req, res, next) => {
 });
 // Middleware to [ass session data to all ejs views
 app.use((req, res, next) => {
-    res.locals.userSession = req.session;
+    res.locals.userSession = {
+        userId: req.session.userId || (req.user ? req.user.id : null),
+        userName: req.session.userName || (req.user ? req.user.name : null),
+        userRole: req.session.userRole || (req.user ? req.user.role : null)
+    };
     next();
 });
 
