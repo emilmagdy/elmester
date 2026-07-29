@@ -158,18 +158,7 @@
                                         👁️ عرض التقييمات والآراء بالتفصيل
                                     </a>
 
-                                    <% if (typeof userSession !=='undefined' && userSession && userSession.userId) { %>
-                                        <a href="/teachers/<%= teacher.id %>#review-section"
-                                            class="text-secondary small d-block mt-1 fw-bold text-decoration-none">
-                                            ✍️ أضف تقييمك السريع لهذا المدرس
-                                        </a>
-                                        <% } else { %>
-                                            <button type="button"
-                                                class="btn btn-outline-dark btn-sm fw-bold px-3 shadow-sm rounded-pill w-100"
-                                                data-bs-toggle="modal" data-bs-target="#loginPromptModal">
-                                                🔒 سجل دخولك لتقييم المدرس
-                                            </button>
-                                            <% } %>
+                                   
                                 </div>
                             </div>
                         </div>
