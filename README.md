@@ -62,3 +62,5 @@ The application is built using a Server-Side Rendered (SSR) Full-Stack architect
    ```bash
    git clone [https://github.com/emilmagdy/elmestar.git](https://github.com/your-username/elmestar.git)
    cd elmestar
+   npm install
+   npm start
