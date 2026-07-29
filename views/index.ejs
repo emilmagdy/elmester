@@ -69,7 +69,6 @@
     <%- include('partials/header') %>
 
         <main>
-            <!-- قسم الـ Hero -->
             <div class="hero-section shadow-sm" style="padding: 0px 0; border-radius: 0 0 24px 24px;">
                 <div class="container">
                     <div class="row justify-content-center align-items-center g-2 text-center">
@@ -91,7 +90,6 @@
                 </div>
             </div>
 
-            <!-- عنوان المدرسين الأعلى تقييماً -->
             <div class="container mt-5 mb-4">
                 <h2 class="text-center fw-bold text-dark position-relative pb-2">
                     🏆 المدرسين الأعلى تقييماً على مستوى الجمهورية
@@ -100,7 +98,6 @@
                     الطلاب</p>
             </div>
 
-            <!-- كروت المدرسين -->
             <div class="container">
                 <div class="row row-cols-1 row-cols-md-2 g-4 justify-content-center">
                     <% teachers.forEach(teacher=> { %>
@@ -134,7 +131,6 @@
                                             تقييم)</small>
                                 </div>
 
-                                <!-- روابط التواصل الاجتماعي -->
                                 <div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
                                     <% if (teacher.facebook_url) { %>
                                         <a href="<%= teacher.facebook_url %>" target="_blank"
@@ -156,7 +152,6 @@
                                                         <% } %>
                                 </div>
 
-                                <!-- الأزرار التفاعلية -->
                                 <div class="border-top pt-3 text-center">
                                     <a href="/teachers/<%= teacher.id %>/<%= teacher.subject_slug %>/<%= teacher.study_type %>/<%= teacher.teacher_slug %>"
                                         class="btn btn-primary btn-sm px-4 py-2 fw-semibold rounded-pill w-100 mb-2">
@@ -182,7 +177,6 @@
                 </div>
             </div>
 
-            <!-- قسم مميزات المنصة -->
             <div class="container my-5">
                 <h2 class="text-center fw-bold mb-5 text-dark">ليه تختار منصة المستر</h2>
                 <div class="row g-4 text-center">

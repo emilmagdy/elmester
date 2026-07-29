@@ -13,7 +13,7 @@ try {
     const email = profile.emails[0].value.trim().toLowerCase()
     const name = profile.displayName
 
-    // if user exists in our database 
+    // Check if user exists in the database 
     let userRes = await pool.query('SELECT * FROM users WHERE google_id = $1 OR email = $2 ', [googleId, email])
     let user = userRes.rows[0]
     if (!user) {

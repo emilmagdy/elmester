@@ -1,10 +1,8 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
     <div class="container d-flex align-items-center justify-content-between">
         
-        <!-- اللوجو -->
         <a class="navbar-brand fw-bold text-primary fs-4 me-0 me-lg-3" href="/">المستر 🎓</a>
 
-        <!-- العناصر الثابتة التي تظهر دائماً على الموبايل والديسك توب -->
         <div class="d-flex align-items-center gap-2 order-lg-last">
             
             <% if (typeof userSession !== 'undefined' && userSession && userSession.userId) { %>
@@ -12,13 +10,11 @@
                 <a href="/logout" class="btn btn-danger btn-sm px-3 fw-bold">تسجيل خروج</a>
             <% } else { %>
                 
-                <!-- أزرار الدخول العادية تظهر فقط في الشاشات الكبيرة -->
                 <div class="d-none d-lg-flex gap-2">
                     <a href="/login" class="btn btn-outline-light btn-sm px-3">تسجيل الدخول</a>
                     <a href="/register" class="btn btn-primary btn-sm px-3 fw-bold">إنشاء حساب</a>
                 </div>
 
-                <!-- زرار جوجل ظاهر دائماً (موبايل + ديسك توب) -->
                 <a href="/auth/google"
                     class="btn btn-light btn-sm px-2 px-sm-3 fw-bold d-flex align-items-center gap-2 shadow-sm border">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 48 48">
@@ -32,14 +28,12 @@
 
             <% } %>
 
-            <!-- زر التوجل للموبايل -->
             <button class="navbar-toggler ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
                 aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
         </div>
 
-        <!-- القائمة المنسدلة (تختفي في الموبايل وتظهر بالضغط على الهامبرجر) -->
         <div class="collapse navbar-collapse" id="mainNavbar">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 p-0 d-flex gap-2 fs-5">
                 <li class="nav-item">
@@ -52,7 +46,6 @@
                     <a class="nav-link <%= locals.currentPage && currentPage === 'suggest-teacher' ? 'active' : '' %>" href="/suggest-teacher">رشح لنا مدرس</a>
                 </li>
 
-                <!-- إظهار أزرار التسجيل العادية داخل القائمة المنسدلة للموبايل فقط -->
                 <% if (!(typeof userSession !== 'undefined' && userSession && userSession.userId)) { %>
                     <li class="nav-item d-lg-none mt-2 pt-2 border-top">
                         <a href="/login" class="btn btn-outline-light btn-sm w-100 mb-2">تسجيل الدخول</a>

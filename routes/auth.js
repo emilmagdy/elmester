@@ -124,7 +124,6 @@ router.post("/login", async (req, res, next) => {
             return res.redirect("/login");
         }
 
-        // ربط الـ Session ببيانات المستخدم
         req.session.userId = user.id;
         req.session.userRole = user.role;
         req.session.userName = user.name;
@@ -143,10 +142,8 @@ router.post("/login", async (req, res, next) => {
 // User Logout Action Route (GET)
 // ==================================
 router.get("/logout", (req, res, next) => {
-    // 1. تسجيل الخروج من Passport
     req.logout((err) => {
         if (err) return next(err);
-        // 2. تدمير الـ Session ومسح الـ Cookie
         req.session.destroy((err) => {
             if (err) return next(err);
             res.clearCookie("connect.sid");
