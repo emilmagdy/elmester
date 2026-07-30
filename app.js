@@ -1,4 +1,5 @@
 require("dotenv").config()
+const path = require('path')
 const dns = require('dns');
 dns.setDefaultResultOrder('ipv4first');
 const session = require("express-session")
@@ -19,6 +20,7 @@ const indexRoutes = require("./routes/index")
 app.set('view engine', 'ejs');
 app.set("trust proxy", 1);
 app.use('/static', express.static('static'));
+app.use(express.static(path.join(__dirname, 'static')));
 
 // Middleware to parse the URL Encoded data embedded in the form body
 app.use(express.urlencoded({ extended: true }));

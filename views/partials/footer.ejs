@@ -1,9 +1,11 @@
 <footer class="bg-dark text-white pt-5 pb-3 mt-5 border-top border-secondary">
     <div class="container">
-        <div class="row g-4 text-end"> <div class="col-lg-4 col-md-6">
+        <div class="row g-4 text-end">
+            <div class="col-lg-4 col-md-6">
                 <h5 class="fw-bold mb-3 text-primary">منصة المستر 🎓</h5>
                 <p class="text-white-50 small lh-lg">
-                    منصة تعليمية متكاملة تهدف إلى ربط الطلاب بأفضل المدرسين، وتمكين أولياء الأمور من تقييم التجربة التعليمية بكل شفافية ودقة لدعم مستقبل أبنائنا.
+                    منصة تعليمية متكاملة تهدف إلى ربط الطلاب بأفضل المدرسين، وتمكين أولياء الأمور من تقييم التجربة
+                    التعليمية بكل شفافية ودقة لدعم مستقبل أبنائنا.
                 </p>
             </div>
 
@@ -48,9 +50,15 @@
     .hover-link {
         transition: color 0.2s ease-in-out, padding-right 0.2s ease-in-out;
     }
+
     .hover-link:hover {
         color: #0d6efd !important;
         text-decoration: underline !important;
-        padding-right: 4px; 
+        padding-right: 4px;
     }
 </style>
+<script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch(err => console.log(err));
+    }
+</script>
