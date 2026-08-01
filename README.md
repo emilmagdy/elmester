@@ -50,8 +50,7 @@ While originally built as a domain platform for educator discovery, the core cod
 ├── views/                # EJS template views
 ├── public/               # Static assets (CSS, client JS)
 └── server.js             # Application entry point & middleware pipeline assembly
-
----
+```
 
 ## 🚀 Local Development Setup
 
@@ -59,21 +58,21 @@ While originally built as a domain platform for educator discovery, the core cod
 ```bash
 git clone https://github.com/emilmagdy/elmestar.git
 cd elmestar
-
+```
 ### 2.Install Dependencies
 ```bash
 npm install
-
+```
 ### 3.Configure Environment Variables
 
 * Create a .env file in the root directory:
 ``` PORT=5000
 DATABASE_URL=postgres://user:password@localhost:5432/elmestar_db
 SESSION_SECRET=your_secure_random_session_secret
-
+```
 ### 4.Start the Application
 ``` Bash
 npm start
-
+```
 
 
