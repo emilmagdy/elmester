@@ -42,4 +42,7 @@ router.get("/robots.txt", (req, res, next) => {
     res.sendFile(path.join(__dirname, "../static", "robots.txt"));
 });
 
+router.get("/health", (req,res) => (
+    res.send("OK")
+));
 module.exports = router;
