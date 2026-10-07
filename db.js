@@ -10,7 +10,7 @@ const pool = new Pool({
     connectionTimeoutMillis: 10000,
 
     // 2. Idle Timeout: Time a client can sit idle in the pool before being closed (set to 30 seconds)
-    idleTimeoutMillis: 30000,
+    idleTimeoutMillis: 10000,
 
     // 3. Max Clients: Maximum number of clients allowed inside the pool simultaneously
     max: 10
